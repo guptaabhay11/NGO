@@ -1,0 +1,90 @@
+
+import { type Request, type Response } from 'express';
+import asyncHandler from "express-async-handler";
+import { createResponse } from "../common/helper/response.helper";
+import { createUserTokens } from '../common/services/passport-jwt.services';
+import { type IUser } from "./user.dto";
+
+import * as userService from "./user.service";
+
+import jwt from "jsonwebtoken";
+
+
+export const createUser = asyncHandler(async (req: Request, res: Response) => {
+    const result = await userService.createUser(req.body);
+    const { password, ...user } = result;
+    res.send(createResponse(user, "User created successfully"))
+});
+
+// export const updateUser = asyncHandler(async (req: Request, res: Response) => {
+//     const result = await userService.updateUser(req.params.id, req.body);
+//     res.send(createResponse(result, "User updated successfully"))
+// });
+
+// export const editUser = asyncHandler(async (req: Request, res: Response) => {
+//     const result = await userService.editUser(req.params.id, req.body);
+//     res.send(createResponse(result, "User updated successfully"))
+// });
+
+// export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
+//     const result = await userService.deleteUser(req.params.id);
+//     res.send(createResponse(result, "User deleted successfully"))
+// });
+
+
+export const getUserById = asyncHandler(async (req: Request, res: Response) => {
+    const result = await userService.getUserById(req.params.id);
+    res.send(createResponse(result))
+});
+
+
+export const getAllUser = asyncHandler(async (req: Request, res: Response) => {
+    const result = await userService.getAllUser();
+    res.send(createResponse(result))
+});
+
+export const login = asyncHandler(async (req: Request, res: Response) => {
+    const user = req.user as Omit<IUser, "password" & "pdf">;
+    const tokens = createUserTokens(user);
+    res.send(createResponse(tokens))
+});
+
+
+export const getUserInfo = asyncHandler(async (req: Request, res: Response) => {
+    const userId = (req.user as any)?.id;
+    console.log("User ID", userId);
+
+    const user = await userService.getUserById(userId);
+    res.send(createResponse(user))
+});
+
+export const refreshToken = asyncHandler(async (req: Request, res: Response) => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+    throw new Error("Refresh token is required");
+  }
+
+  try {
+    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET as string) as { userId: string, role: string };
+    const accessToken = userService.generateRefreshToken(decoded.userId, decoded.role);
+    throw new Error("User not found");
+  } catch (err) {
+    throw new Error("Invalid refresh token");
+  }
+})
+
+export const addBalance = asyncHandler(async (req: Request, res: Response) => {
+  const userId = (req.user as any)?.id;
+  const amount = req.body.amount;
+  const user = await userService.addBalance(userId, amount);
+  res.send(createResponse(user));
+});
+export const addBankDetails = asyncHandler(async (req: Request, res: Response) => {
+  const userId = (req.user as any)?.id;
+  const bankDetails = req.body;
+  const user = await userService.addBankDetails(userId, bankDetails);
+  res.send(createResponse(user));
+}
+);
+
