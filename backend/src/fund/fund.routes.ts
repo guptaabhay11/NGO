@@ -12,7 +12,7 @@ const router = Router();
 router
     .post("/create", roleAuth(['ADMIN']), catchError, fundController.createFund)
     .patch("/donate/:id", roleAuth(['ADMIN', 'USER']), catchError, fundController.donateFund)
-    .get("/all", roleAuth(['ADMIN', 'USER']), catchError, fundController.getAllFunds)
+    .get("/all", catchError, fundController.getAllFunds)
     .get("/analytics/:id", roleAuth(['ADMIN', 'USER']), catchError, fundController.getFundAnalytics)
     .get("/recentDonations", roleAuth(['ADMIN', 'USER']), catchError, fundController.getRecentDonations)
     .delete("/delete/:id", roleAuth(['ADMIN']), catchError, fundController.deleteFund);
