@@ -27,7 +27,7 @@ const FundCard: React.FC<FundCardProps> = ({ fund, onDonate, onDelete }) => {
   const isFundClosed = progress >= 100;
 
   const handleViewDetails = () => {
-    navigate(`/fund/${fund.id}`);
+    navigate(`/fund/${fund._id}`);  // Changed from fund.id to fund._id
   };
 
   return (
@@ -86,7 +86,7 @@ const FundCard: React.FC<FundCardProps> = ({ fund, onDonate, onDelete }) => {
           <Button 
             size="small" 
             color="error" 
-            onClick={() => onDelete(fund.id)}
+            onClick={() => onDelete(fund._id)}  // Changed from fund.id to fund._id
             sx={{ ml: 'auto' }}
           >
             Delete

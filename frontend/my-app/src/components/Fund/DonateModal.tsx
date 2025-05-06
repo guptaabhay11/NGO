@@ -18,7 +18,7 @@ import {
 import { useDonateFundMutation } from '../../services/api';
 
 interface Fund {
-  id: string;
+  _id: string;
   name: string;
   currentAmount: number;
   targetAmount: number;
@@ -52,7 +52,7 @@ const DonateModal: React.FC<DonateModalProps> = ({ open, fund, onClose }) => {
     
     try {
       await donateFund({
-        fundId: fund.id,
+        fundId: fund._id,
         amount,
         interval
       }).unwrap();

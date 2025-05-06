@@ -1,8 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { api } from '../../services/api';
+import { User } from '../../services/api'; // adjust the path if needed
 
 interface AuthState {
-  user: any | null;
+  user: User | null;
   accessToken: string | null;
   refreshToken: string | null;
   isAdmin: boolean;
@@ -10,15 +11,17 @@ interface AuthState {
   isAuthenticated: boolean;
 }
 
+const ACCESS_TOKEN_KEY = 'access_token';
+const REFRESH_TOKEN_KEY = 'refresh_token';
+
 const initialState: AuthState = {
   user: null,
-  accessToken: localStorage.getItem('token'),
-  refreshToken: null,
+  accessToken: localStorage.getItem(ACCESS_TOKEN_KEY),
+  refreshToken: localStorage.getItem(REFRESH_TOKEN_KEY),
   loading: false,
   isAdmin: false,
-  isAuthenticated: false
+  isAuthenticated: !!localStorage.getItem(ACCESS_TOKEN_KEY),
 };
-
 
 const authSlice = createSlice({
   name: 'auth',
@@ -27,46 +30,58 @@ const authSlice = createSlice({
     logout: (state) => {
       state.user = null;
       state.accessToken = null;
+      state.refreshToken = null;
       state.isAdmin = false;
-      localStorage.removeItem('token');
+      state.isAuthenticated = false;
+      localStorage.removeItem(ACCESS_TOKEN_KEY);
+      localStorage.removeItem(REFRESH_TOKEN_KEY);
+    },
+    setUser: (state, action: PayloadAction<User>) => {
+      state.user = action.payload;
+      state.isAdmin = action.payload.role === 'admin';
     },
   },
   extraReducers: (builder) => {
     builder
+      // LOGIN
       .addMatcher(api.endpoints.login.matchPending, (state) => {
         state.loading = true;
-        return state;
       })
-      .addMatcher(api.endpoints.login.matchFulfilled, (state, action) => {
-        const data = action.payload.data;
-        localStorage.setItem('access_token', data.accessToken);
-        localStorage.setItem('refresh_token', data.refreshToken);
-        state.accessToken = data.accessToken;
-        state.refreshToken = data.refreshToken;
+      .addMatcher(api.endpoints.login.matchFulfilled, (state, { payload }) => {
+        const { accessToken, refreshToken, user } = payload.data;
+
+        state.accessToken = accessToken;
+        state.refreshToken = refreshToken;
+        state.user = user;
+        state.isAdmin = user.role === 'admin';
         state.isAuthenticated = true;
         state.loading = false;
-        return state;
+
+        localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+        localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
       })
       .addMatcher(api.endpoints.login.matchRejected, (state) => {
-        state.accessToken = '';
-        state.refreshToken = '';
+        state.accessToken = null;
+        state.refreshToken = null;
+        state.user = null;
+        state.isAdmin = false;
         state.isAuthenticated = false;
         state.loading = false;
-        return state;
+      })
+
+      // LOGOUT
+      .addMatcher(api.endpoints.logout.matchFulfilled, (state) => {
+        state.user = null;
+        state.accessToken = null;
+        state.refreshToken = null;
+        state.isAdmin = false;
+        state.isAuthenticated = false;
+        state.loading = false;
+        localStorage.removeItem(ACCESS_TOKEN_KEY);
+        localStorage.removeItem(REFRESH_TOKEN_KEY);
       });
-  
-    builder.addMatcher(api.endpoints.logout.matchFulfilled, (state) => {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-      state.accessToken = '';
-      state.refreshToken = '';
-      state.isAuthenticated = false;
-      state.loading = false;
-      return state;
-    });
-  }
-  
+  },
 });
 
-export const { logout } = authSlice.actions;
+export const { logout, setUser } = authSlice.actions;
 export default authSlice.reducer;

@@ -7,6 +7,9 @@ import {
   Alert 
 } from '@mui/material';
 import { useLoginMutation } from '../../services/api';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../../store/reducers/authReducer';
+import { useNavigate } from 'react-router-dom'; // ✅ Import this
 
 interface LoginProps {
   switchToRegister: () => void;
@@ -16,17 +19,29 @@ const Login: React.FC<LoginProps> = ({ switchToRegister }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate(); // ✅ Initialize
+
   const [login, { isLoading }] = useLoginMutation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
-    
-      const log = await login({ email, password }).unwrap();
-      console.log(log)
-   
+
+    try {
+      const response = await login({ email, password }).unwrap();
+      const { user } = response.data;
+
+      dispatch(setUser(user));
+
+      // ✅ Redirect after successful login
+      navigate('/dashboard'); // Change route as needed
+
+    } catch (err: any) {
+      console.error(err);
+      setError(err?.data?.message || 'Login failed');
+    }
   };
 
   return (
@@ -34,13 +49,13 @@ const Login: React.FC<LoginProps> = ({ switchToRegister }) => {
       <Typography component="h1" variant="h5" align="center" gutterBottom>
         Login
       </Typography>
-      
+
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
           {error}
         </Alert>
       )}
-      
+
       <TextField
         margin="normal"
         required
@@ -53,7 +68,7 @@ const Login: React.FC<LoginProps> = ({ switchToRegister }) => {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
-      
+
       <TextField
         margin="normal"
         required
@@ -66,7 +81,7 @@ const Login: React.FC<LoginProps> = ({ switchToRegister }) => {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-      
+
       <Button
         type="submit"
         fullWidth
@@ -76,7 +91,7 @@ const Login: React.FC<LoginProps> = ({ switchToRegister }) => {
       >
         {isLoading ? 'Logging in...' : 'Login'}
       </Button>
-      
+
       <Box textAlign="center">
         <Typography variant="body2">
           Don't have an account?{' '}

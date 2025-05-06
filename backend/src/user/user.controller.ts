@@ -46,7 +46,18 @@ export const getAllUser = asyncHandler(async (req: Request, res: Response) => {
 export const login = asyncHandler(async (req: Request, res: Response) => {
     const user = req.user as Omit<IUser, "password" & "pdf">;
     const tokens = createUserTokens(user);
-    res.send(createResponse(tokens))
+    res.send(
+      createResponse({
+        ...tokens,
+        user: {
+          id: user._id,
+          email: user.email,
+          role: user.role,
+          name: user.name,
+         
+        },
+      })
+    );
 });
 
 

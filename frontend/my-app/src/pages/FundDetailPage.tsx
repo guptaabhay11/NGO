@@ -39,7 +39,7 @@ const FundDetailPage: React.FC = () => {
     );
   }
   
-  const fund = funds?.find(f => f.id === id);
+  const fund = funds?.data?.find(f => f.id === id);
   
   if (!fund) {
     return (
@@ -144,7 +144,7 @@ const FundDetailPage: React.FC = () => {
       </Typography>
       <Divider sx={{ mb: 3 }} />
       
-      <Analytics fundId={fund.id} />
+      <Analytics fundId={fund._id} />
       
       {/* Donate Modal */}
       <DonateModal
