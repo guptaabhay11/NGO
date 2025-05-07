@@ -1,0 +1,244 @@
+{
+    "/fund/create": {
+      "post": {
+        "summary": "Create a new fund (Admin only)",
+        "description": "Creates a new fundraising campaign",
+        "tags": ["Fund"],
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FundCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Fund created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid fund data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (Admin role required)"
+          }
+        }
+      }
+    },
+    "/fund/donate/{id}": {
+      "patch": {
+        "summary": "Donate to a fund",
+        "description": "Make a donation to a specific fundraising campaign",
+        "tags": ["Fund"],
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Fund ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Donation"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Donation successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid donation data or insufficient balance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Fund not found"
+          }
+        }
+      }
+    },
+    "/fund/all": {
+      "get": {
+        "summary": "Get all active funds",
+        "description": "Returns a list of all active fundraising campaigns",
+        "tags": ["Fund"],
+        "responses": {
+          "200": {
+            "description": "List of active funds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/fund/analytics/{id}": {
+      "get": {
+        "summary": "Get fund analytics",
+        "description": "Returns analytics data for a specific fund",
+        "tags": ["Fund"],
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Fund ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fund analytics data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Fund not found"
+          }
+        }
+      }
+    },
+    "/fund/getfund/{id}": {
+      "get": {
+        "summary": "Get fund by ID",
+        "description": "Returns details of a specific fundraising campaign",
+        "tags": ["Fund"],
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Fund ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fund details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Fund not found"
+          }
+        }
+      }
+    },
+    "/fund/recentDonations": {
+      "get": {
+        "summary": "Get recent donations",
+        "description": "Returns a list of recent donations across all funds",
+        "tags": ["Fund"],
+        "security": [{"bearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "List of recent donations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/fund/delete/{id}": {
+      "delete": {
+        "summary": "Delete a fund (Admin only)",
+        "description": "Marks a fund as inactive (soft delete)",
+        "tags": ["Fund"],
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Fund ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fund deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (Admin role required)"
+          },
+          "404": {
+            "description": "Fund not found"
+          }
+        }
+      }
+    }
+  }
+  

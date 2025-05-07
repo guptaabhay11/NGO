@@ -21,8 +21,3 @@ router
 
 export default router;
 
-
-function post(arg0: string, arg1: RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, catchError: RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, donateFund: RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>) {
-    throw new Error("Function not implemented.");
-}
-   

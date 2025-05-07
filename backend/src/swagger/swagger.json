@@ -1,0 +1,655 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API Documentation",
+    "version": "1.0.0",
+    "description": "API for user management and fundraising"
+  },
+  
+  "paths": {
+    "/api/funds/create": {
+      "post": {
+        "summary": "Create a new fund (Admin only)",
+        "description": "Creates a new fundraising campaign",
+        "tags": ["Fund"],
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FundCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Fund created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid fund data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (Admin role required)"
+          }
+        }
+      }
+    },
+    "/api/funds/donate/{id}": {
+      "patch": {
+        "summary": "Donate to a fund",
+        "description": "Make a donation to a specific fundraising campaign",
+        "tags": ["Fund"],
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Fund ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Donation"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Donation successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid donation data or insufficient balance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Fund not found"
+          }
+        }
+      }
+    },
+    "/api/funds/all": {
+      "get": {
+        "summary": "Get all active funds",
+        "description": "Returns a list of all active fundraising campaigns",
+        "tags": ["Fund"],
+        "responses": {
+          "200": {
+            "description": "List of active funds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/fund/analytics/{id}": {
+      "get": {
+        "summary": "Get fund analytics",
+        "description": "Returns analytics data for a specific fund",
+        "tags": ["Fund"],
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Fund ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fund analytics data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Fund not found"
+          }
+        }
+      }
+    },
+    "/api/funds/getfund/{id}": {
+      "get": {
+        "summary": "Get fund by ID",
+        "description": "Returns details of a specific fundraising campaign",
+        "tags": ["Fund"],
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Fund ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fund details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Fund not found"
+          }
+        }
+      }
+    },
+    "api/funds/recentDonations": {
+      "get": {
+        "summary": "Get recent donations",
+        "description": "Returns a list of recent donations across all funds",
+        "tags": ["Fund"],
+        "security": [{"bearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "List of recent donations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/funds/delete/{id}": {
+      "delete": {
+        "summary": "Delete a fund (Admin only)",
+        "description": "Marks a fund as inactive (soft delete)",
+        "tags": ["Fund"],
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Fund ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fund deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (Admin role required)"
+          },
+          "404": {
+            "description": "Fund not found"
+          }
+        }
+      }
+    },
+    "/api/users/register": {
+      "post": {
+        "summary": "Register a new user",
+        "operationId": "createUser",
+        "tags": ["User"],
+        "requestBody": {
+          "description": "User registration data",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserRegistration"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error or user already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/login": {
+      "post": {
+        "summary": "Login a user",
+        "operationId": "loginUser",
+        "tags": ["User"],
+        "requestBody": {
+          "description": "User login credentials",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserLogin"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/me": {
+      "get": {
+        "summary": "Get current user information",
+        "operationId": "getUserInfo",
+        "tags": ["User"],
+        "security": [{"bearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "User information retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/addBankDetails": {
+      "post": {
+        "summary": "Add bank details for the current user",
+        "operationId": "addBankDetails",
+        "tags": ["User"],
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "description": "Bank details to add",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BankDetails"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Bank details added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid bank details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/addBalance": {
+      "patch": {
+        "summary": "Add balance to user account",
+        "operationId": "addBalance",
+        "tags": ["User"],
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "description": "Amount to add",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "type": "number",
+                    "example": 100
+                  }
+                },
+                "required": ["amount"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Balance added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid amount",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/refresh": {
+      "post": {
+        "summary": "Refresh access token using refresh token",
+        "operationId": "refreshToken",
+        "tags": ["User"],
+        "requestBody": {
+          "description": "Refresh token",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "refreshToken": {
+                    "type": "string",
+                    "example": "your.refresh.token.here"
+                  }
+                },
+                "required": ["refreshToken"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token refreshed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid refresh token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "UserRegistration": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "John Doe"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "john.doe@example.com"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 6,
+            "example": "securePassword123"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["USER", "ADMIN", "STAFF"],
+            "example": "USER"
+          }
+        },
+        "required": ["name", "email", "password", "role"]
+      },
+      "UserLogin": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "john.doe@example.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "securePassword123"
+          }
+        },
+        "required": ["email", "password"]
+      },
+      "BankDetails": {
+        "type": "string"
+      },
+      "FundCreate": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Education Fund"
+          },
+          "description": {
+            "type": "string",
+            "example": "Fund to support education for underprivileged children"
+          },
+          "targetAmount": {
+            "type": "number",
+            "example": 10000
+          },
+          "plan": {
+            "type": "string",
+            "enum": ["monthly", "quarterly", "half-yearly", "yearly"],
+            "example": "monthly"
+          }
+        },
+        "required": ["name", "description", "targetAmount", "plan"]
+      },
+      "Donation": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "minimum": 1,
+            "example": 100
+          },
+          "interval": {
+            "type": "string",
+            "enum": ["one-time", "monthly", "quarterly", "yearly"],
+            "example": "one-time"
+          }
+        },
+        "required": ["amount", "interval"]
+      },
+      "SuccessResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Operation successful"
+          },
+          "data": {
+            "type": "object"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Error message"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "example": "your.access.token.here"
+          },
+          "refreshToken": {
+            "type": "string",
+            "example": "your.refresh.token.here"
+          },
+          "user": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "507f1f77bcf86cd799439011"
+              },
+              "email": {
+                "type": "string",
+                "example": "john.doe@example.com"
+              },
+              "role": {
+                "type": "string",
+                "example": "USER"
+              },
+              "name": {
+                "type": "string",
+                "example": "John Doe"
+              }
+            }
+          }
+        }
+      },
+      "TokenResponse": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "example": "your.new.access.token.here"
+          }
+        }
+      }
+    }
+  }
+}
