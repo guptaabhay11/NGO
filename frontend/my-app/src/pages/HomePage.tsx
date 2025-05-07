@@ -7,40 +7,60 @@ import {
   Button,
   Card,
   CardContent,
-  CardMedia,
-  Divider
+  Divider,
+  Chip,
+  Avatar,
+  useTheme
 } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { RootState } from '../store/store';
-import FundsList from '../components/Fund/FundsList';
 import { useGetRecentDonationsQuery } from '../services/api';
+import FundsList from '../components/Fund/FundsList';
 
 const HomePage: React.FC = () => {
-  const accessToken = localStorage.getItem('access_token') 
-  console.log("accessToken", accessToken)
+  const accessToken = localStorage.getItem('access_token');
   const { data: recentDonations } = useGetRecentDonationsQuery();
-  console.log("recentDonations", recentDonations)
+  const theme = useTheme();
 
   return (
-    <Box>
+    <Box sx={{ bgcolor: theme.palette.background.default }}>
       {/* Hero Section */}
       <Paper 
         sx={{ 
-          py: 8, 
-          px: 3, 
-          mb: 4, 
-          background: 'linear-gradient(120deg, #2196f3, #3f51b5)',
+          py: { xs: 6, md: 12 },
+          px: 2, 
+          mb: 6,
+          background: 'linear-gradient(135deg, #1976d2 0%, #303f9f 100%)',
           color: 'white',
-          borderRadius: 0
+          borderRadius: 0,
+          boxShadow: theme.shadows[10]
         }}
       >
         <Container maxWidth="lg">
-          <Box sx={{ maxWidth: { md: '60%' } }}>
-            <Typography variant="h2" component="h1" gutterBottom fontWeight="bold">
+          <Box sx={{ 
+            maxWidth: { md: '65%' },
+            textAlign: { xs: 'center', md: 'left' }
+          }}>
+            <Typography 
+              variant="h2" 
+              component="h1" 
+              gutterBottom 
+              sx={{ 
+                fontWeight: 800,
+                letterSpacing: 1,
+                fontSize: { xs: '2.5rem', md: '3.5rem' }
+              }}
+            >
               Make a Difference Today
             </Typography>
-            <Typography variant="h6" paragraph sx={{ mb: 4 }}>
+            <Typography 
+              variant="h5" 
+              paragraph 
+              sx={{ 
+                mb: 4,
+                lineHeight: 1.6,
+                fontSize: { xs: '1.1rem', md: '1.25rem' }
+              }}
+            >
               Join our crowdfunding platform to support causes you care about. 
               Every donation, no matter how small, creates a huge impact.
             </Typography>
@@ -52,8 +72,16 @@ const HomePage: React.FC = () => {
                 to="/auth"
                 sx={{ 
                   bgcolor: 'white', 
-                  color: '#3f51b5',
-                  '&:hover': { bgcolor: '#e0e0e0' } 
+                  color: theme.palette.primary.main,
+                  px: 4,
+                  py: 1.5,
+                  fontSize: '1.1rem',
+                  fontWeight: 600,
+                  '&:hover': { 
+                    bgcolor: 'rgba(255,255,255,0.9)',
+                    transform: 'translateY(-2px)'
+                  },
+                  transition: 'all 0.3s ease'
                 }}
               >
                 Join Now
@@ -66,8 +94,16 @@ const HomePage: React.FC = () => {
                 to="/dashboard"
                 sx={{ 
                   bgcolor: 'white', 
-                  color: '#3f51b5',
-                  '&:hover': { bgcolor: '#e0e0e0' } 
+                  color: theme.palette.primary.main,
+                  px: 4,
+                  py: 1.5,
+                  fontSize: '1.1rem',
+                  fontWeight: 600,
+                  '&:hover': { 
+                    bgcolor: 'rgba(255,255,255,0.9)',
+                    transform: 'translateY(-2px)'
+                  },
+                  transition: 'all 0.3s ease'
                 }}
               >
                 Dashboard
@@ -79,99 +115,148 @@ const HomePage: React.FC = () => {
 
       <Container maxWidth="lg" sx={{ mb: 8 }}>
         {/* Active Campaigns Section */}
-        <Box sx={{ mb: 6 }}>
-          <Typography variant="h4" component="h2" gutterBottom>
+        <Box sx={{ mb: 8 }}>
+          <Typography 
+            variant="h3" 
+            component="h2" 
+            gutterBottom 
+            sx={{ 
+              fontWeight: 700,
+              color: theme.palette.text.primary
+            }}
+          >
             Active Campaigns
           </Typography>
-          <Divider sx={{ mb: 3 }} />
+          <Divider 
+            sx={{ 
+              mb: 4,
+              height: 4,
+              width: 100,
+              bgcolor: theme.palette.primary.main,
+              borderRadius: 2
+            }} 
+          />
           <FundsList />
         </Box>
-
-        {/* Recent Donations Section */}
-        {recentDonations && recentDonations.length > 0 && (
-          <Box sx={{ mb: 6 }}>
-            <Typography variant="h4" component="h2" gutterBottom>
-              Recent Supporters
-            </Typography>
-            <Divider sx={{ mb: 3 }} />
-            
-            <Box sx={{ 
-              display: 'flex', 
-              flexWrap: 'wrap',
-              gap: 2
-            }}>
-              {recentDonations.slice(0, 3).map((donation) => (
-                <Box 
-                  key={donation.id} 
-                  sx={{ 
-                    width: {
-                      xs: '100%',
-                      sm: 'calc(33.33% - 11px)'  // Accounting for gap
-                    }
-                  }}
-                >
-                  <Card>
-                    <CardContent>
-                      <Typography variant="h6" gutterBottom>
-                        {donation.userName}
-                      </Typography>
-                      <Typography variant="body1" color="text.secondary">
-                        Donated ${donation.amount}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {new Date(donation.date).toLocaleDateString()}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Box>
-              ))}
-            </Box>
-          </Box>
-        )}
-
         {/* How It Works Section */}
-        <Box>
-          <Typography variant="h4" component="h2" gutterBottom>
+        <Box sx={{ mb: 4 }}>
+          <Typography 
+            variant="h3" 
+            component="h2" 
+            gutterBottom
+            sx={{ 
+              fontWeight: 700,
+              color: theme.palette.text.primary
+            }}
+          >
             How It Works
           </Typography>
-          <Divider sx={{ mb: 3 }} />
+          <Divider 
+            sx={{ 
+              mb: 4,
+              height: 4,
+              width: 100,
+              bgcolor: theme.palette.primary.main,
+              borderRadius: 2
+            }} 
+          />
           
           <Box sx={{ 
-            display: 'flex', 
-            flexDirection: { xs: 'column', md: 'row' },
+            display: 'grid',
+            gridTemplateColumns: { 
+              xs: '1fr', 
+              md: 'repeat(3, 1fr)' 
+            },
             gap: 4
           }}>
-            <Card sx={{ flex: 1 }}>
-              <CardContent>
-                <Typography variant="h5" component="h3" gutterBottom>
-                  1. Choose a cause
-                </Typography>
-                <Typography variant="body1">
-                  Browse through our active funding campaigns and select one that resonates with you.
-                </Typography>
-              </CardContent>
+            <Card 
+              sx={{ 
+                p: 3,
+                textAlign: 'center',
+                borderTop: `4px solid ${theme.palette.primary.main}`
+              }}
+            >
+              <Box 
+                sx={{ 
+                  width: 60,
+                  height: 60,
+                  bgcolor: theme.palette.primary.light,
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  mx: 'auto',
+                  mb: 3
+                }}
+              >
+                <Typography variant="h4" color="primary">1</Typography>
+              </Box>
+              <Typography variant="h5" component="h3" gutterBottom>
+                Choose a cause
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                Browse through our active funding campaigns and select one that resonates with you.
+              </Typography>
             </Card>
             
-            <Card sx={{ flex: 1 }}>
-              <CardContent>
-                <Typography variant="h5" component="h3" gutterBottom>
-                  2. Set up your donation
-                </Typography>
-                <Typography variant="body1">
-                  Choose a one-time donation or select a recurring plan that fits your budget.
-                </Typography>
-              </CardContent>
+            <Card 
+              sx={{ 
+                p: 3,
+                textAlign: 'center',
+                borderTop: `4px solid ${theme.palette.secondary.main}`
+              }}
+            >
+              <Box 
+                sx={{ 
+                  width: 60,
+                  height: 60,
+                  bgcolor: theme.palette.secondary.light,
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  mx: 'auto',
+                  mb: 3
+                }}
+              >
+                <Typography variant="h4" color="secondary">2</Typography>
+              </Box>
+              <Typography variant="h5" component="h3" gutterBottom>
+                Set up your donation
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                Choose a one-time donation or select a recurring plan that fits your budget.
+              </Typography>
             </Card>
             
-            <Card sx={{ flex: 1 }}>
-              <CardContent>
-                <Typography variant="h5" component="h3" gutterBottom>
-                  3. Make an impact
-                </Typography>
-                <Typography variant="body1">
-                  Your contribution helps our NGO reach its goals and creates positive change in communities.
-                </Typography>
-              </CardContent>
+            <Card 
+              sx={{ 
+                p: 3,
+                textAlign: 'center',
+                borderTop: `4px solid ${theme.palette.success.main}`
+              }}
+            >
+              <Box 
+                sx={{ 
+                  width: 60,
+                  height: 60,
+                  bgcolor: theme.palette.success.light,
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  mx: 'auto',
+                  mb: 3
+                }}
+              >
+                <Typography variant="h4" color="success">3</Typography>
+              </Box>
+              <Typography variant="h5" component="h3" gutterBottom>
+                Make an impact
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                Your contribution helps our NGO reach its goals and creates positive change in communities.
+              </Typography>
             </Card>
           </Box>
         </Box>
@@ -180,4 +265,4 @@ const HomePage: React.FC = () => {
   );
 };
 
-export default HomePage;
+export default HomePage; 

@@ -7,6 +7,7 @@ import {
   Alert 
 } from '@mui/material';
 import { useRegisterMutation } from '../../services/api';
+import { useNavigate } from 'react-router-dom'; // Add this import
 
 interface RegisterProps {
   switchToLogin: () => void;
@@ -18,6 +19,7 @@ const Register: React.FC<RegisterProps> = ({ switchToLogin }) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate(); // Initialize the navigate function
   
   const [register, { isLoading }] = useRegisterMutation();
 
@@ -32,16 +34,19 @@ const Register: React.FC<RegisterProps> = ({ switchToLogin }) => {
     
     try {
       await register({
-          name, email, confirmPassword,
-          password: ''
+        name, 
+        email, 
+        confirmPassword,
+        password: confirmPassword
       }).unwrap();
+      navigate('/login'); // Redirect on success
     } catch (err: any) {
       setError(err.data?.message || 'Registration failed. Please try again.');
     }
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, maxWidth: 400, mx: 'auto' }}>
       <Typography component="h1" variant="h5" align="center" gutterBottom>
         Register
       </Typography>

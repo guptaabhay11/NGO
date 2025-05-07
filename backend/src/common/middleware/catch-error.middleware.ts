@@ -10,6 +10,7 @@ export const catchError = expressAsyncHandler(
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     if (!isError) {
       const data = { errors: errors.array() };
+      console.log(data)
       throw createHttpError(400, {
         message: "Validation error!",
         data,

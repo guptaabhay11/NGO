@@ -24,6 +24,8 @@ import FundsList from '../Fund/FundsList';
 const DashboardPage: React.FC = () => {
   const { user, loading } = useSelector((state: RootState) => state.auth); // Check if user is loading
   const isAdmin = user?.role === 'ADMIN';
+  console.log(isAdmin);
+  console.log(user)
 
   const { data: recentDonations, isLoading: loadingDonations } = useGetRecentDonationsQuery();
 

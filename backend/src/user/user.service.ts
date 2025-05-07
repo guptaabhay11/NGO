@@ -59,20 +59,6 @@ export const addPdfUrlToUser = async (id: string, pdfUrl: string) => {
 };
 
 
-export const uploadPdfToCloudinary = async (uploadResult: any, userId: string) => {
-  try {
-    const updatedUser = await addPdfUrlToUser(userId, uploadResult.secure_url);
-    
-    if (!updatedUser) {
-      throw new Error("User not found");
-    }
-
-    return updatedUser;
-  } catch (error) {
-    throw error;
-  }
-};
-
 export const generateRefreshToken = (id: string, role: string): string => {
   return jwt.sign({ id, role }, process.env.JWT_REFRESH_SECRET as string, { expiresIn: "7d" });
 };
@@ -81,7 +67,10 @@ export const addBalance = async (userId: string, amount: number) => {
   const user = await UserSchema.findById(userId);
   if (!user) throw new Error("User not found");
   user.amount += amount;
+  console.log(user.amount);
+
   await user.save();
+  console.log("after", user.amount)
   return user;
 }
 export const addBankDetails = async (userId: string, bankDetails: any) => { 

@@ -129,6 +129,14 @@ export const api = createApi({
       query: (fundId) => `funds/getfunds/${fundId}`,
     }),
 
+    addBalance: builder.mutation<void, {userId: string, amount: number }>({
+      query: ({ userId, amount }) => ({
+        url: `users/addBalance`,
+        method: "PATCH",
+        body: { amount, userId },
+      }),
+    }),
+
     getRecentDonations: builder.query<Donation[], void>({
       query: () => "funds/recentDonations",
     }),
@@ -141,6 +149,7 @@ export const {
   useRegisterMutation,
   useLogoutMutation,
   useCreateFundMutation,
+  useAddBalanceMutation,
   useDonateFundMutation,
   useGetAllFundsQuery,
   useGetFundAnalyticsQuery,

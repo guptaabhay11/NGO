@@ -10,6 +10,7 @@ declare module "*.svg" {
     name: string;
     email: string;
     active: boolean;
+    amount: number
     role: "USER" | "ADMIN";
   }
   

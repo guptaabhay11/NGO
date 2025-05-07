@@ -3,12 +3,15 @@ import { Routes, Route } from 'react-router-dom';
 import { LinearProgress, CssBaseline, Container } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
+
 // Lazy-loaded components
 const HomePage = lazy(() => import('./pages/HomePage'));
 const DashboardPage = lazy(() => import('./pages/DashboardPage'));
 const FundDetails = lazy(() => import('./pages/FundDetailPage'));
 const LoginPage = lazy(() => import('./components/Auth/Login'));
 const FundsPage = lazy(() => import('./pages/FundDetailPage'));
+const RegisterPage = lazy(() => import('./components/Auth/Register'));
+
 
 const theme = createTheme();
 
@@ -27,6 +30,8 @@ const App: React.FC = () => {
             <Route path="/auth" element={<LoginPage switchToRegister={() => {}} />} />
             <Route path="/fund-details" element={<FundDetails />} />
             <Route path="/fund/:id" element={<FundDetails />} />
+            <Route path="/register" element={<RegisterPage switchToLogin={() => {}} />} />
+           
           </Routes>
         </Suspense>
       </Container>

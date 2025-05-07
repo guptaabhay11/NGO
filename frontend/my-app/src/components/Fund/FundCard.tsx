@@ -1,12 +1,12 @@
 import React from 'react';
-import { 
-  Card, 
-  CardContent, 
-  CardActions, 
-  Typography, 
-  Button, 
-  LinearProgress, 
-  Box 
+import {
+  Card,
+  CardContent,
+  CardActions,
+  Typography,
+  Button,
+  LinearProgress,
+  Box
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { Fund } from '../../services/api';
@@ -25,11 +25,11 @@ const FundCard: React.FC<FundCardProps> = ({ fund, onDonate, onDelete }) => {
   
   const progress = Math.min((fund.currentAmount / fund.targetAmount) * 100, 100);
   const isFundClosed = progress >= 100;
-
+  
   const handleViewDetails = () => {
-    navigate(`/fund/${fund._id}`);  // Changed from fund.id to fund._id
+    navigate(`/fund/${fund._id}`);
   };
-
+  
   return (
     <Card sx={{ mb: 3, borderRadius: 2 }}>
       <CardContent>
@@ -40,7 +40,7 @@ const FundCard: React.FC<FundCardProps> = ({ fund, onDonate, onDelete }) => {
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
           {fund.description}
         </Typography>
-
+        
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
           <Typography variant="body2" color="text.secondary">
             Progress: {progress.toFixed(0)}%
@@ -51,8 +51,8 @@ const FundCard: React.FC<FundCardProps> = ({ fund, onDonate, onDelete }) => {
         </Box>
         
         <LinearProgress 
-          variant="determinate" 
-          value={progress} 
+          variant="determinate"
+          value={progress}
           color={isFundClosed ? "success" : "primary"}
           sx={{ height: 8, borderRadius: 4 }}
         />
@@ -65,16 +65,16 @@ const FundCard: React.FC<FundCardProps> = ({ fund, onDonate, onDelete }) => {
       </CardContent>
       
       <CardActions sx={{ px: 2, pb: 2 }}>
-        <Button 
-          size="small" 
+        <Button
+          size="small"
           onClick={handleViewDetails}
         >
           View Details
         </Button>
         
-        <Button 
-          size="small" 
-          variant="contained" 
+        <Button
+          size="small"
+          variant="contained"
           onClick={() => onDonate(fund)}
           disabled={isFundClosed}
           sx={{ ml: 1 }}
@@ -83,10 +83,10 @@ const FundCard: React.FC<FundCardProps> = ({ fund, onDonate, onDelete }) => {
         </Button>
         
         {isAdmin && onDelete && (
-          <Button 
-            size="small" 
-            color="error" 
-            onClick={() => onDelete(fund._id)}  // Changed from fund.id to fund._id
+          <Button
+            size="small"
+            color="error"
+            onClick={() => onDelete(fund._id)}
             sx={{ ml: 'auto' }}
           >
             Delete
