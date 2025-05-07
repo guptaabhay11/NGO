@@ -102,3 +102,9 @@ export const getRecentDonations = async () => {
    
    return history;
 }
+
+export const getFundById = async (fundId: string) => {
+    const fund = await fundSchemas.findById(fundId).populate("admin", "name email");
+    if (!fund) throw new Error("Fund not found");
+    return fund;
+}

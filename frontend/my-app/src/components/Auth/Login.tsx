@@ -35,8 +35,8 @@ const Login: React.FC<LoginProps> = ({ switchToRegister }) => {
 
       dispatch(setUser(user));
 
-      // ✅ Redirect after successful login
-      navigate('/dashboard'); // Change route as needed
+      
+      navigate('/dashboard'); 
 
     } catch (err: any) {
       console.error(err);

@@ -14,41 +14,28 @@ import {
   CircularProgress,
   Alert
 } from '@mui/material';
-import { useGetFundAnalyticsQuery } from '../../services/api';
 
 interface Donation {
   _id: string;
-  donatedBy: {
-    name: string;
-  };
-  plan: {
-    amount: number;
-    interval: string;
-  };
+  donatedBy: { name: string };
+  plan: { amount: number; interval: string };
   createdAt: string;
 }
 
-interface AnalyticsResponse {
-  data: {
-    currentAmount: number;
-    targetAmount: number;
-    recentDonations: Donation[];
-    donations: {
-      length: number;
-    };
-  };
-  message: string;
-  success: boolean;
+interface AnalyticsData {
+  currentAmount: number;
+  targetAmount: number;
+  recentDonations: Donation[];
+  donations: { length: number };
 }
 
 interface AnalyticsProps {
-  fundId: string;
+  data?: AnalyticsData;
+  isLoading: boolean;
+  error: any;
 }
 
-const Analytics: React.FC<AnalyticsProps> = ({ fundId }) => {
-  const { data: response, isLoading, error } = useGetFundAnalyticsQuery({ fundId });
-  console.log('Analytics data:', response);
-
+const Analytics: React.FC<AnalyticsProps> = ({ data, isLoading, error }) => {
   if (isLoading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
@@ -57,7 +44,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ fundId }) => {
     );
   }
 
-  if (error || !response?.data) {
+  if (error || !data) {
     return (
       <Alert severity="error" sx={{ my: 2 }}>
         {error ? (error as any)?.data?.message || 'Failed to load analytics data' : 'No data available'}
@@ -65,61 +52,39 @@ const Analytics: React.FC<AnalyticsProps> = ({ fundId }) => {
     );
   }
 
-  const fundData = response.data;
-  const totalDonations = fundData.currentAmount;
-  const totalDonors = fundData.donations?.length || 0;
-  const recentDonations = fundData.recentDonations || [];
+  const { currentAmount, donations, recentDonations } = data;
+  const totalDonors = donations?.length || 0;
 
   return (
     <Box>
-      {/* Stats Cards */}
-      <Box sx={{ 
-        display: 'flex', 
-        flexDirection: { xs: 'column', md: 'row' },
-        gap: 3,
-        mb: 3
-      }}>
+      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3, mb: 3 }}>
         <Card sx={{ flex: 1 }}>
           <CardContent>
-            <Typography variant="h6" gutterBottom>
-              Total Donations
-            </Typography>
-            <Typography variant="h4" color="primary">
-              ${totalDonations}
-            </Typography>
+            <Typography variant="h6" gutterBottom>Total Donations</Typography>
+            <Typography variant="h4" color="primary">${currentAmount}</Typography>
           </CardContent>
         </Card>
-        
+
         <Card sx={{ flex: 1 }}>
           <CardContent>
-            <Typography variant="h6" gutterBottom>
-              Total Donors
-            </Typography>
-            <Typography variant="h4" color="primary">
-              {totalDonors}
-            </Typography>
+            <Typography variant="h6" gutterBottom>Total Donors</Typography>
+            <Typography variant="h4" color="primary">{totalDonors}</Typography>
           </CardContent>
         </Card>
-        
+
         <Card sx={{ flex: 1 }}>
           <CardContent>
-            <Typography variant="h6" gutterBottom>
-              Average Donation
-            </Typography>
+            <Typography variant="h6" gutterBottom>Average Donation</Typography>
             <Typography variant="h4" color="primary">
-              ${totalDonors > 0 ? (totalDonations / totalDonors).toFixed(2) : 0}
+              ${totalDonors > 0 ? (currentAmount / totalDonors).toFixed(2) : 0}
             </Typography>
           </CardContent>
         </Card>
       </Box>
 
-      {/* Recent Donations */}
       <Card sx={{ mt: 4 }}>
         <CardContent>
-          <Typography variant="h6" gutterBottom>
-            Recent Donations
-          </Typography>
-          
+          <Typography variant="h6" gutterBottom>Recent Donations</Typography>
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
@@ -132,11 +97,9 @@ const Analytics: React.FC<AnalyticsProps> = ({ fundId }) => {
               </TableHead>
               <TableBody>
                 {recentDonations.length > 0 ? (
-                  recentDonations.map((donation: Donation) => (
+                  recentDonations.map(donation => (
                     <TableRow key={donation._id}>
-                      <TableCell component="th" scope="row">
-                        {donation.donatedBy?.name || 'Anonymous'}
-                      </TableCell>
+                      <TableCell>{donation.donatedBy?.name || 'Anonymous'}</TableCell>
                       <TableCell align="right">${donation.plan.amount}</TableCell>
                       <TableCell align="right">{donation.plan.interval}</TableCell>
                       <TableCell align="right">
@@ -146,9 +109,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ fundId }) => {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={4} align="center">
-                      No recent donations
-                    </TableCell>
+                    <TableCell colSpan={4} align="center">No recent donations</TableCell>
                   </TableRow>
                 )}
               </TableBody>

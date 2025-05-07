@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
-import { 
-  Container, 
-  Box, 
-  Typography, 
-  Button, 
-  Paper, 
-  Grid, 
+import React, { useMemo, useState, useEffect } from 'react';
+import {
+  Container,
+  Box,
+  Typography,
+  Button,
+  Paper,
   LinearProgress,
   Divider,
   Alert,
@@ -14,51 +13,64 @@ import {
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
-import { 
-  useGetAllFundsQuery, 
-  Fund, 
-  useDeleteFundMutation 
+import {
+  useGetAllFundsQuery,
+  useGetFundAnalyticsQuery,
+  useDeleteFundMutation,
+  Fund
 } from '../services/api';
 import Analytics from '../components/Dashboard/Analytics';
 import DonateModal from '../components/Fund/DonateModal';
 
 const FundDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  console.log("Received ID:", id); // Debug log for id
+
   const navigate = useNavigate();
-  const { data: funds, isLoading } = useGetAllFundsQuery();
-  const [deleteFund] = useDeleteFundMutation();
   const { accessToken, isAdmin } = useSelector((state: RootState) => state.auth);
-  
   const [donateModalOpen, setDonateModalOpen] = useState(false);
+
+  const { data: funds, isLoading, refetch: refetchFunds } = useGetAllFundsQuery();
+  const [deleteFund] = useDeleteFundMutation();
+
+ 
+  const fund = useMemo(() => {
+    return funds?.data?.find(f => f._id === id);
+  }, [funds, id]);
+
+ 
+  const {
+    data: analyticsData,
+    isLoading: analyticsLoading,
+    error: analyticsError,
+    refetch: refetchAnalytics
+  } = useGetFundAnalyticsQuery({ fundId: fund?._id || '' }, { skip: !fund?._id });
+
+  console.log("Fund details for id:", id);
+  console.log("Fund:", fund);
+  console.log("Analytics Data:", analyticsData);
+
   
-  if (isLoading) {
+  useEffect(() => {
+    if (id && !fund) {
+      
+      refetchFunds();
+    }
+  }, [id, fund, refetchFunds]);
+
+  
+  if (isLoading || !fund) {
     return (
       <Container maxWidth="lg" sx={{ mt: 4, mb: 8, display: 'flex', justifyContent: 'center' }}>
-        <CircularProgress />
+        {isLoading ? <CircularProgress /> : <Alert severity="error">Fund not found</Alert>}
       </Container>
     );
   }
-  
-  const fund = funds?.data?.find(f => f.id === id);
-  
-  if (!fund) {
-    return (
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 8 }}>
-        <Alert severity="error">Fund not found</Alert>
-        <Button 
-          variant="contained" 
-          onClick={() => navigate('/')} 
-          sx={{ mt: 2 }}
-        >
-          Back to Home
-        </Button>
-      </Container>
-    );
-  }
-  
+
+ 
   const progress = Math.min((fund.currentAmount / fund.targetAmount) * 100, 100);
   const isFundClosed = progress >= 100;
-  
+
   const handleDonate = () => {
     if (!accessToken) {
       navigate('/auth');
@@ -66,7 +78,7 @@ const FundDetailPage: React.FC = () => {
     }
     setDonateModalOpen(true);
   };
-  
+
   const handleDelete = async () => {
     if (window.confirm('Are you sure you want to delete this fund?')) {
       try {
@@ -77,80 +89,52 @@ const FundDetailPage: React.FC = () => {
       }
     }
   };
-  
+
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 8 }}>
       <Paper sx={{ p: 4, mb: 4 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
-          <Typography variant="h4" component="h1">
-            {fund.name}
-          </Typography>
-          
+          <Typography variant="h4">{fund.name}</Typography>
           <Box>
-            <Button variant="outlined" onClick={() => navigate(-1)} sx={{ mr: 1 }}>
-              Back
-            </Button>
-            
+            <Button variant="outlined" onClick={() => navigate(-1)} sx={{ mr: 1 }}>Back</Button>
             {isAdmin && (
-              <Button variant="outlined" color="error" onClick={handleDelete}>
-                Delete Fund
-              </Button>
+              <Button variant="outlined" color="error" onClick={handleDelete}>Delete Fund</Button>
             )}
           </Box>
         </Box>
-        
-        <Typography variant="body1" paragraph>
-          {fund.description}
-        </Typography>
-        
+
+        <Typography paragraph>{fund.description}</Typography>
+
         <Box sx={{ mt: 4, mb: 2 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-            <Typography variant="body1">
-              Progress: {progress.toFixed(0)}%
-            </Typography>
-            <Typography variant="body1">
-              ${fund.currentAmount} of ${fund.targetAmount}
-            </Typography>
+            <Typography>Progress: {progress.toFixed(0)}%</Typography>
+            <Typography>${fund.currentAmount} of ${fund.targetAmount}</Typography>
           </Box>
-          
-          <LinearProgress 
-            variant="determinate" 
-            value={progress} 
-            color={isFundClosed ? "success" : "primary"}
-            sx={{ height: 10, borderRadius: 5 }}
-          />
-          
+          <LinearProgress value={progress} variant="determinate" sx={{ height: 10, borderRadius: 5 }} />
           {isFundClosed && (
             <Alert severity="success" sx={{ mt: 2 }}>
               Target reached! This funding campaign is now closed.
             </Alert>
           )}
         </Box>
-        
+
         {!isFundClosed && (
-          <Button 
-            variant="contained" 
-            size="large" 
-            onClick={handleDonate}
-            sx={{ mt: 2 }}
-          >
+          <Button variant="contained" size="large" onClick={handleDonate} sx={{ mt: 2 }}>
             Donate Now
           </Button>
         )}
       </Paper>
-      
-      <Typography variant="h5" gutterBottom>
-        Fund Analytics
-      </Typography>
+
+      <Typography variant="h5" gutterBottom>Fund Analytics</Typography>
       <Divider sx={{ mb: 3 }} />
-      
-      <Analytics fundId={fund._id} />
-      
-      {/* Donate Modal */}
+      <Analytics data={analyticsData?.data} isLoading={analyticsLoading} error={analyticsError} />
+
       <DonateModal
         open={donateModalOpen}
         fund={fund}
         onClose={() => setDonateModalOpen(false)}
+        refetchAnalytics={refetchAnalytics}
+        refetchFunds={refetchFunds}
       />
     </Container>
   );

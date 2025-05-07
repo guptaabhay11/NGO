@@ -48,4 +48,11 @@ export const getRecentDonations = asyncHandler(async (req: Request, res: Respons
 }
 );  
 
+export const getFundById = asyncHandler(async (req: Request, res: Response) => {
+  const fundId = req.params.id;
+  const fund = await fundService.getFundById(fundId);
+  res.status(200).send(createResponse(fund, "Fund fetched successfully"));
+}
+);
+
 

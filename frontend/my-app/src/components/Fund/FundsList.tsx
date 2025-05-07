@@ -82,7 +82,7 @@ const FundList: React.FC = () => {
               <Button
                 size="small"
                 color="primary"
-                onClick={() => navigate(`/admin/fund/${fund._id}`)}
+                onClick={() => navigate(`/fund/${fund._id}`)}
               >
                 View Details
               </Button>

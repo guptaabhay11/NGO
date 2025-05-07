@@ -11,7 +11,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store/store';
 import { useLogoutMutation } from '../../services/api';
-import { logout } from '../../store/reducers/authReducer';
+import logout from '../../store/reducers/authReducer';
 
 const Header: React.FC = () => {
   const { accessToken } = useSelector((state: RootState) => state.auth);
@@ -19,12 +19,6 @@ const Header: React.FC = () => {
   const [logoutApi] = useLogoutMutation();
 
   const handleLogout = async () => {
-    try {
-      await logoutApi().unwrap();
-      dispatch(logout());
-    } catch (error) {
-      console.error('Failed to logout:', error);
-    }
   };
 
   return (

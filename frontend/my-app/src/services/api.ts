@@ -60,6 +60,7 @@ export const api = createApi({
       return headers;
     },
   }),
+  tagTypes: ['Funds'],
   endpoints: (builder) => ({
     me: builder.query<User, void>({
       query: () => "users/me",
@@ -92,7 +93,15 @@ export const api = createApi({
     }),
 
     createFund: builder.mutation<Fund, { name: string; description: string; targetAmount: number; plan: string }>({
-      query: (body) => ({ url: "funds/create", method: "POST", body }),
+      query: (body) => ({
+        url: "funds/create",
+        method: "POST",
+        body,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }),
+      invalidatesTags: ['Funds'],
     }),
 
     donateFund: builder.mutation<Donation, { fundId: string; amount: number; interval: string }>({
@@ -105,6 +114,7 @@ export const api = createApi({
 
   getAllFunds: builder.query<ApiResponse<Fund[]>, void>({
   query: () => '/funds/all', // Adjust the endpoint if needed
+  providesTags: ['Funds'],
 }),
 
     getFundAnalytics: builder.query<FundAnalytics, { fundId: string }>({
@@ -113,6 +123,10 @@ export const api = createApi({
 
     deleteFund: builder.mutation<void, { fundId: string }>({
       query: ({ fundId }) => ({ url: `funds/delete/${fundId}`, method: "DELETE" }),
+    }),
+
+    getFundById: builder.query<ApiResponse<Fund>, string>({
+      query: (fundId) => `funds/getfunds/${fundId}`,
     }),
 
     getRecentDonations: builder.query<Donation[], void>({
@@ -130,6 +144,7 @@ export const {
   useDonateFundMutation,
   useGetAllFundsQuery,
   useGetFundAnalyticsQuery,
+  useGetFundByIdQuery,
   useDeleteFundMutation,
   useGetRecentDonationsQuery,
 } = api;
