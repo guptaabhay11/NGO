@@ -14,15 +14,40 @@ import {
   CircularProgress,
   Alert
 } from '@mui/material';
-
 import { useGetFundAnalyticsQuery } from '../../services/api';
+
+interface Donation {
+  _id: string;
+  donatedBy: {
+    name: string;
+  };
+  plan: {
+    amount: number;
+    interval: string;
+  };
+  createdAt: string;
+}
+
+interface AnalyticsResponse {
+  data: {
+    currentAmount: number;
+    targetAmount: number;
+    recentDonations: Donation[];
+    donations: {
+      length: number;
+    };
+  };
+  message: string;
+  success: boolean;
+}
 
 interface AnalyticsProps {
   fundId: string;
 }
 
 const Analytics: React.FC<AnalyticsProps> = ({ fundId }) => {
-  const { data, isLoading, error } = useGetFundAnalyticsQuery({ fundId });
+  const { data: response, isLoading, error } = useGetFundAnalyticsQuery({ fundId });
+  console.log('Analytics data:', response);
 
   if (isLoading) {
     return (
@@ -32,17 +57,22 @@ const Analytics: React.FC<AnalyticsProps> = ({ fundId }) => {
     );
   }
 
-  if (error || !data) {
+  if (error || !response?.data) {
     return (
       <Alert severity="error" sx={{ my: 2 }}>
-        Failed to load analytics data.
+        {error ? (error as any)?.data?.message || 'Failed to load analytics data' : 'No data available'}
       </Alert>
     );
   }
 
+  const fundData = response.data;
+  const totalDonations = fundData.currentAmount;
+  const totalDonors = fundData.donations?.length || 0;
+  const recentDonations = fundData.recentDonations || [];
+
   return (
     <Box>
-      {/* Stats Cards using Flexbox instead of Grid */}
+      {/* Stats Cards */}
       <Box sx={{ 
         display: 'flex', 
         flexDirection: { xs: 'column', md: 'row' },
@@ -55,7 +85,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ fundId }) => {
               Total Donations
             </Typography>
             <Typography variant="h4" color="primary">
-              ${data.totalDonations}
+              ${totalDonations}
             </Typography>
           </CardContent>
         </Card>
@@ -66,7 +96,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ fundId }) => {
               Total Donors
             </Typography>
             <Typography variant="h4" color="primary">
-              {data.donors}
+              {totalDonors}
             </Typography>
           </CardContent>
         </Card>
@@ -77,7 +107,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ fundId }) => {
               Average Donation
             </Typography>
             <Typography variant="h4" color="primary">
-              ${data.donors > 0 ? (data.totalDonations / data.donors).toFixed(2) : 0}
+              ${totalDonors > 0 ? (totalDonations / totalDonors).toFixed(2) : 0}
             </Typography>
           </CardContent>
         </Card>
@@ -101,20 +131,20 @@ const Analytics: React.FC<AnalyticsProps> = ({ fundId }) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {data.recentDonations.map((donation) => (
-                  <TableRow key={donation.id}>
-                    <TableCell component="th" scope="row">
-                      {donation.userName}
-                    </TableCell>
-                    <TableCell align="right">${donation.amount}</TableCell>
-                    <TableCell align="right">{donation.interval}</TableCell>
-                    <TableCell align="right">
-                      {new Date(donation.date).toLocaleDateString()}
-                    </TableCell>
-                  </TableRow>
-                ))}
-                
-                {data.recentDonations.length === 0 && (
+                {recentDonations.length > 0 ? (
+                  recentDonations.map((donation: Donation) => (
+                    <TableRow key={donation._id}>
+                      <TableCell component="th" scope="row">
+                        {donation.donatedBy?.name || 'Anonymous'}
+                      </TableCell>
+                      <TableCell align="right">${donation.plan.amount}</TableCell>
+                      <TableCell align="right">{donation.plan.interval}</TableCell>
+                      <TableCell align="right">
+                        {new Date(donation.createdAt).toLocaleDateString()}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
                   <TableRow>
                     <TableCell colSpan={4} align="center">
                       No recent donations

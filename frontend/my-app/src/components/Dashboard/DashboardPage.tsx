@@ -43,7 +43,8 @@ const DashboardPage: React.FC = () => {
       await createFund({
         name: fundName,
         description: fundDescription,
-        targetAmount: fundTarget
+        targetAmount: fundTarget,
+        plan: ''
       }).unwrap();
       
       setCreateFundOpen(false);

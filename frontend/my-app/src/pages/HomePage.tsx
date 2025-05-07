@@ -20,6 +20,7 @@ const HomePage: React.FC = () => {
   const accessToken = localStorage.getItem('access_token') 
   console.log("accessToken", accessToken)
   const { data: recentDonations } = useGetRecentDonationsQuery();
+  console.log("recentDonations", recentDonations)
 
   return (
     <Box>

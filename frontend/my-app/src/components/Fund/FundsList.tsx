@@ -13,10 +13,12 @@ import { useGetAllFundsQuery } from "../../services/api";
 import { useNavigate } from "react-router-dom";
 
 const FundList: React.FC = () => {
-  const { data, isLoading, error } = useGetAllFundsQuery();
-  const funds = data ?? [];
+  const { data: response, isLoading, error } = useGetAllFundsQuery();
+  const funds = response?.data ?? [];  // Access the data property of the response
+
   const navigate = useNavigate();
 
+  // Loader during data fetch
   if (isLoading) {
     return (
       <Box display="flex" justifyContent="center" mt={4}>
@@ -25,6 +27,7 @@ const FundList: React.FC = () => {
     );
   }
 
+  // Error handling if any
   if (error) {
     return (
       <Alert severity="error" sx={{ my: 2 }}>
@@ -33,6 +36,7 @@ const FundList: React.FC = () => {
     );
   }
 
+  // Check if the data format is valid
   if (!Array.isArray(funds)) {
     return (
       <Alert severity="error" sx={{ my: 2 }}>
@@ -47,12 +51,7 @@ const FundList: React.FC = () => {
         All Funds
       </Typography>
 
-      <Box
-        display="flex"
-        flexWrap="wrap"
-        gap={2}
-        justifyContent="flex-start"
-      >
+      <Box display="flex" flexWrap="wrap" gap={2} justifyContent="flex-start">
         {funds.map((fund) => (
           <Card
             key={String(fund._id)}

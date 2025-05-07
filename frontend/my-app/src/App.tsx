@@ -4,7 +4,7 @@ import { LinearProgress, CssBaseline, Container } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Dashboard } from '@mui/icons-material';
 import DashboardPage from './pages/DashboardPage';
-
+import FundDetails from './pages/FundDetailPage';
 // Lazy-loaded components
 const HomePage = lazy(() => import('./pages/HomePage'));
 const FundsPage = lazy(() => import('./pages/FundDetailPage'));
@@ -34,6 +34,7 @@ const App: React.FC = () => {
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/fund-details" element={<FundsPage />} />
           <Route path="/auth" element = {<LoginPage switchToRegister={() => console.log('Switch to register')} />} />
+          <Route path="/admin/fund/:fundId" element={<FundDetails />} />
           
 
           </Routes>
