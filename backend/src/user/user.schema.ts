@@ -59,10 +59,11 @@ const UserSchema = new Schema<IUser>(
 );
 
 UserSchema.pre("save", async function (next) {
-  if (this.password) {
+  if (this.isModified("password")) {
     this.password = await hashPassword(this.password);
   }
   next();
 });
+
 
 export default model<IUser>("User", UserSchema);
