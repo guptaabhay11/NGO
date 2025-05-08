@@ -74,9 +74,11 @@ export const donateFund = async (
 };
 
 export const getAllFunds = async () => {
-    const funds = await fundSchemas.find({ isActive: true }).populate("admin", "name email");
-    return funds;
-}
+    return await fundSchemas
+      .find()
+      .populate("admin", "name email")
+      .sort({ isActive: -1 });
+  };
 
 export const getFundAnalytics = async (fundId: string) => {
     const fund = await fundSchemas.findById(fundId).populate("admin", "name email");

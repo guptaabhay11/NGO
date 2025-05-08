@@ -73,13 +73,14 @@ export const addBalance = async (userId: string, amount: number) => {
   console.log("after", user.amount)
   return user;
 }
-export const addBankDetails = async (userId: string, bankDetails: any) => { 
+export const addBankDetails = async (userId: string, bankDetails: string) => { 
   const user = await UserSchema.findById(userId);
   if (!user) throw new Error("User not found");
-  user.bankDetails = bankDetails;
-  await user.save();
-  return user;
-} 
 
+  user.bankDetails = bankDetails; 
+  await user.save();
+
+  return user;
+}
  
 
