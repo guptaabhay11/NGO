@@ -4,32 +4,26 @@ import asyncHandler from "express-async-handler";
 import { createResponse } from "../common/helper/response.helper";
 import { createUserTokens } from '../common/services/passport-jwt.services';
 import { type IUser } from "./user.dto";
-
+import { stripe } from "../common/services/stripe.services";
 import * as userService from "./user.service";
 
 import jwt from "jsonwebtoken";
 
 
 export const createUser = asyncHandler(async (req: Request, res: Response) => {
-    const result = await userService.createUser(req.body);
+  const {email, name} = req.body;
+  const customer = await stripe.customers.create({
+      email,
+      name,
+      metadata: {
+        source: "ngo-donation-app",
+      },
+    });
+    const result = await userService.createUser(req.body, customer.id);
+
     const { password, ...user } = result;
     res.send(createResponse(user, "User created successfully"))
 });
-
-// export const updateUser = asyncHandler(async (req: Request, res: Response) => {
-//     const result = await userService.updateUser(req.params.id, req.body);
-//     res.send(createResponse(result, "User updated successfully"))
-// });
-
-// export const editUser = asyncHandler(async (req: Request, res: Response) => {
-//     const result = await userService.editUser(req.params.id, req.body);
-//     res.send(createResponse(result, "User updated successfully"))
-// });
-
-// export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
-//     const result = await userService.deleteUser(req.params.id);
-//     res.send(createResponse(result, "User deleted successfully"))
-// });
 
 
 export const getUserById = asyncHandler(async (req: Request, res: Response) => {

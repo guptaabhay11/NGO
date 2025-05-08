@@ -6,6 +6,7 @@ const hashPassword = async (password: string) => {
   const hash = await bcrypt.hash(password, 12);
   return hash;
 };
+
 const UserSchema = new Schema<IUser>(
   {
     name: {
@@ -26,16 +27,22 @@ const UserSchema = new Schema<IUser>(
       enum: ["USER", "ADMIN"],
       default: "USER",
     },
+
     bankDetails: {
-      type: String,
-      required: false,
+      type: String, // Optional for now
     },
 
     funds: [{ type: mongoose.Schema.Types.ObjectId, ref: "Fund" }],
-    amount: {
-      type: Number,
-      default: 5000,
+
+    
+    stripeCustomerId: {
+      type: String,
     },
+    subscriptionId: {
+      type: String,
+    },
+
+    
     donationHistory: [
       {
         fundId: {
@@ -46,6 +53,12 @@ const UserSchema = new Schema<IUser>(
           type: Number,
         },
         interval: {
+          type: String, // "month", "quarter", etc.
+        },
+        paymentDate: {
+          type: Date,
+        },
+        stripeInvoiceId: {
           type: String,
         },
       },
@@ -53,17 +66,17 @@ const UserSchema = new Schema<IUser>(
 
     refreshToken: {
       type: String,
-    }
+    },
   },
   { timestamps: true }
 );
 
+// Hash password before saving
 UserSchema.pre("save", async function (next) {
   if (this.isModified("password")) {
-    this.password = await hashPassword(this.password);
+    (this as any).password = await hashPassword((this as any).password);
   }
   next();
 });
-
 
 export default model<IUser>("User", UserSchema);

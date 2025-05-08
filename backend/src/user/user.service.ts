@@ -5,27 +5,13 @@ require('dotenv').config();
 import jwt from "jsonwebtoken";
 
 
-export const createUser = async (data: IUser) => {
-    const result = await UserSchema.create({ ...data, active: true });
+export const createUser = async (data: IUser, id: string) => {
+  
+
+    const result = await UserSchema.create({ ...data, active: true, stripeCustomerId: id });
     return result.toObject();
 };
 
-// export const updateUser = async (id: string, data: IUser) => {
-//     const result = await UserSchema.findOneAndUpdate({ _id: id }, data, {
-//         new: true,
-//     });
-//     return result;
-// };
-
-// export const editUser = async (id: string, data: Partial<IUser>) => {
-//     const result = await UserSchema.findOneAndUpdate({ _id: id }, data);
-//     return result;
-// };
-
-// export const deleteUser = async (id: string) => {
-//     const result = await UserSchema.deleteOne({ _id: id });
-//     return result;
-// };
 
 export const getUserById = async (id: string) => {
   console.log("ID", id);
