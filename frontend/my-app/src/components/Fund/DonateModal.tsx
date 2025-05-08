@@ -25,7 +25,8 @@ import {
   CalendarMonth as CalendarIcon,
   Close as CloseIcon
 } from '@mui/icons-material';
-import { useDonateFundMutation, Fund } from '../../services/api';
+import { useDonateFundMutation } from '../../services/api';
+import { Fund } from '../../types';
 
 interface DonateModalProps {
   open: boolean;

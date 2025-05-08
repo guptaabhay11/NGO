@@ -94,7 +94,7 @@ export const addBalance = asyncHandler(async (req: Request, res: Response) => {
 });
 export const addBankDetails = asyncHandler(async (req: Request, res: Response) => {
   const userId = (req.user as any)?.id;
-  const bankDetails = req.body;
+  const {bankDetails} = req.body;
   const user = await userService.addBankDetails(userId, bankDetails);
   res.send(createResponse(user));
 }

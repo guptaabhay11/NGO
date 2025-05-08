@@ -6,6 +6,7 @@ declare module "*.svg" {
   }
   
   interface User {
+    data: any;
     id: string;
     name: string;
     email: string;
@@ -18,6 +19,8 @@ declare module "*.svg" {
     email: string;
     name: string;
     role: string;
+    amount: number;
+    bankDetails: string;
   }
   
   export interface Fund {

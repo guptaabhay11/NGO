@@ -34,10 +34,10 @@ const Register: React.FC<RegisterProps> = ({ switchToLogin }) => {
     
     try {
       await register({
-        name, 
-        email, 
+        name,
+        email,
         confirmPassword,
-        password: confirmPassword
+        password: confirmPassword,
       }).unwrap();
       navigate('/login'); // Redirect on success
     } catch (err: any) {
@@ -120,7 +120,7 @@ const Register: React.FC<RegisterProps> = ({ switchToLogin }) => {
           Already have an account?{' '}
           <Button 
             variant="text" 
-            onClick={switchToLogin}
+            onClick={() => {navigate('/login')}}
             sx={{ p: 0, verticalAlign: 'baseline', textTransform: 'none' }}
           >
             Login

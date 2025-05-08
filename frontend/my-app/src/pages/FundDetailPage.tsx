@@ -31,7 +31,6 @@ import {
   useGetAllFundsQuery,
   useGetFundAnalyticsQuery,
   useDeleteFundMutation,
-  Fund
 } from '../services/api';
 import Analytics from '../components/Dashboard/Analytics';
 import DonateModal from '../components/Fund/DonateModal';

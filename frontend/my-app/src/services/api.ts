@@ -39,7 +39,7 @@ export const api = createApi({
 
     register: builder.mutation<
       { user: User; token: string },
-      Omit<User, "id" | "role"> & { password: string; confirmPassword: string }
+      Omit<User, "id" | "role" | "bankDetails" | "amount" | "active" | "data"> & { password: string; confirmPassword: string }
     >({
       query: (body) => ({
         url: "users/register",

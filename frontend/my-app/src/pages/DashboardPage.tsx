@@ -16,7 +16,7 @@ const DashboardPage: React.FC = () => {
   }, [accessToken, navigate]);
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 8 }}>
+    <Container maxWidth="sm" sx={{ mt: 4, mb: 8 }}>
       <DashboardComponent />
     </Container>
   );

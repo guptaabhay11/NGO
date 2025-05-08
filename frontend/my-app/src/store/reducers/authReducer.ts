@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { api } from '../../services/api';
-import { User } from '../../services/api'; // adjust the path if needed
+import { User } from '../../types'; 
 
 interface AuthState {
   user: User | null;
@@ -38,7 +38,7 @@ const authSlice = createSlice({
     },
     setUser: (state, action: PayloadAction<User>) => {
       state.user = action.payload;
-      state.isAdmin = action.payload.role === 'admin';
+      state.isAdmin = action.payload.role === 'ADMIN';
     },
   },
   extraReducers: (builder) => {
@@ -53,7 +53,7 @@ const authSlice = createSlice({
         state.accessToken = accessToken;
         state.refreshToken = refreshToken;
         state.user = user;
-        state.isAdmin = user.role === 'admin';
+        state.isAdmin = user.role === 'ADMIN';
         state.isAuthenticated = true;
         state.loading = false;
 

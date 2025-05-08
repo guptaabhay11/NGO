@@ -16,7 +16,8 @@ import {
   Divider,
   useTheme,
   Stack,
-  Chip
+  Chip,
+  Skeleton
 } from '@mui/material';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import PeopleIcon from '@mui/icons-material/People';
@@ -42,13 +43,75 @@ interface AnalyticsProps {
   error: any;
 }
 
+// Skeleton component for the summary cards
+const SummaryCardSkeleton = () => {
+  return (
+    <Card elevation={3} sx={{ flex: 1 }}>
+      <CardContent>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+          <Skeleton variant="circular" width={28} height={28} sx={{ mr: 1 }} />
+          <Skeleton variant="text" width={120} height={30} />
+        </Box>
+        <Skeleton variant="rectangular" width="80%" height={50} />
+        <Skeleton variant="text" width="60%" height={20} sx={{ mt: 1 }} />
+      </CardContent>
+    </Card>
+  );
+};
+
+// Skeleton for table rows
+const TableRowSkeleton = () => {
+  return (
+    <TableRow>
+      <TableCell><Skeleton variant="text" width="80%" /></TableCell>
+      <TableCell><Skeleton variant="text" width="60%" /></TableCell>
+      <TableCell><Skeleton variant="rectangular" width={80} height={24} /></TableCell>
+      <TableCell><Skeleton variant="text" width="70%" /></TableCell>
+    </TableRow>
+  );
+};
+
 const Analytics: React.FC<AnalyticsProps> = ({ data, isLoading, error }) => {
   const theme = useTheme();
 
+  // Skeleton loading state
   if (isLoading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
-        <CircularProgress size={60} thickness={4} />
+      <Box sx={{ p: 2 }}>
+        <Skeleton variant="text" width={300} height={45} sx={{ mb: 2 }} />
+        
+        {/* Summary Cards Skeletons */}
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} sx={{ mb: 3 }}>
+          <SummaryCardSkeleton />
+          <SummaryCardSkeleton />
+          <SummaryCardSkeleton />
+        </Stack>
+        
+        {/* Recent Donations Skeleton */}
+        <Card elevation={3}>
+          <CardContent>
+            <Skeleton variant="text" width={200} height={30} sx={{ mb: 1 }} />
+            <Divider sx={{ mb: 2 }} />
+            
+            <TableContainer component={Paper} elevation={0}>
+              <Table>
+                <TableHead>
+                  <TableRow sx={{ bgcolor: theme.palette.action.hover }}>
+                    <TableCell><Skeleton variant="text" width={80} /></TableCell>
+                    <TableCell><Skeleton variant="text" width={80} /></TableCell>
+                    <TableCell><Skeleton variant="text" width={80} /></TableCell>
+                    <TableCell><Skeleton variant="text" width={80} /></TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {[...Array(5)].map((_, index) => (
+                    <TableRowSkeleton key={index} />
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </CardContent>
+        </Card>
       </Box>
     );
   }

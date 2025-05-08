@@ -93,17 +93,23 @@ const Login: React.FC<LoginProps> = ({ switchToRegister }) => {
       </Button>
 
       <Box textAlign="center">
-        <Typography variant="body2">
-          Don't have an account?{' '}
-          <Button 
-            variant="text" 
-            onClick={switchToRegister}
-            sx={{ p: 0, verticalAlign: 'baseline', textTransform: 'none' }}
-          >
-            Register
-          </Button>
-        </Typography>
-      </Box>
+  <Typography variant="body2">
+    Don't have an account?{' '}
+    <Button 
+      variant="text" 
+      onClick={() => navigate('/register')}
+      sx={{ 
+        p: 0, 
+        verticalAlign: 'baseline', 
+        textTransform: 'none',
+        fontSize: 'inherit',
+        fontWeight: 'inherit' 
+      }}
+    >
+      Register
+    </Button>
+  </Typography>
+</Box>
     </Box>
   );
 };

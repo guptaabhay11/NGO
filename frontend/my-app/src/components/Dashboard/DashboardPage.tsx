@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Typography,
@@ -20,13 +20,12 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import { useCreateFundMutation, useGetRecentDonationsQuery } from '../../services/api';
 import FundsList from '../Fund/FundsList';
-
+import UserWallet from './UserWallet'
+import { useNavigate } from 'react-router-dom';
 const DashboardPage: React.FC = () => {
-  const { user, loading } = useSelector((state: RootState) => state.auth); // Check if user is loading
+  const { user, loading } = useSelector((state: RootState) => state.auth);
   const isAdmin = user?.role === 'ADMIN';
-  console.log(isAdmin);
-  console.log(user)
-
+  const navigate = useNavigate();
   const { data: recentDonations, isLoading: loadingDonations } = useGetRecentDonationsQuery();
 
   const [createFundOpen, setCreateFundOpen] = useState(false);
@@ -71,16 +70,14 @@ const DashboardPage: React.FC = () => {
     }
   };
 
-  // 💡 If user data is still loading (e.g. from localStorage hydration), show a loading spinner
-  if (loading) {
+  
+  if (loading || !user) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
         <CircularProgress />
       </Box>
     );
   }
-
-  if (!user) return null;
 
   return (
     <Box sx={{ py: 4 }}>
@@ -89,28 +86,33 @@ const DashboardPage: React.FC = () => {
           <Typography variant="h4" component="h1" gutterBottom>
             Dashboard
           </Typography>
-
-          {isAdmin && (
-            <Button variant="contained" onClick={() => setCreateFundOpen(true)}>
-              Create New Fund
+  
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            {isAdmin && (
+              <Button variant="contained" onClick={() => setCreateFundOpen(true)}>
+                Create New Fund
+              </Button>
+            )}
+            <Button variant="outlined" onClick={() => navigate('/wallet')}>
+              User Wallet
             </Button>
-          )}
+          </Box>
         </Box>
-
+  
         <Typography variant="h6" gutterBottom>
           Welcome, {user.name || 'User'}!
         </Typography>
       </Paper>
-
+  
       <Typography variant="h5" sx={{ mb: 2 }}>
         Active Funds
       </Typography>
       <FundsList />
-
+  
       {/* Dialog for creating a new fund */}
       <Dialog open={createFundOpen} onClose={() => setCreateFundOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Create New Fund</DialogTitle>
-
+  
         <DialogContent>
           {error && (
             <Alert severity="error" sx={{ mb: 2 }}>
@@ -122,7 +124,7 @@ const DashboardPage: React.FC = () => {
               {success}
             </Alert>
           )}
-
+  
           <Box component="form" sx={{ mt: 1 }}>
             <TextField
               margin="normal"
@@ -132,7 +134,7 @@ const DashboardPage: React.FC = () => {
               value={fundName}
               onChange={(e) => setFundName(e.target.value)}
             />
-
+  
             <TextField
               margin="normal"
               required
@@ -143,7 +145,7 @@ const DashboardPage: React.FC = () => {
               value={fundDescription}
               onChange={(e) => setFundDescription(e.target.value)}
             />
-
+  
             <TextField
               margin="normal"
               required
@@ -154,7 +156,7 @@ const DashboardPage: React.FC = () => {
               value={fundTarget}
               onChange={(e) => setFundTarget(Number(e.target.value))}
             />
-
+  
             <FormControl fullWidth margin="normal" required>
               <InputLabel id="plan-label">Plan</InputLabel>
               <Select
@@ -172,7 +174,7 @@ const DashboardPage: React.FC = () => {
             </FormControl>
           </Box>
         </DialogContent>
-
+  
         <DialogActions>
           <Button onClick={() => setCreateFundOpen(false)} disabled={creatingFund}>
             Cancel
@@ -184,6 +186,6 @@ const DashboardPage: React.FC = () => {
       </Dialog>
     </Box>
   );
-};
-
+}
+  
 export default DashboardPage;

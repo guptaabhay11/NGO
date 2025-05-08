@@ -9,7 +9,7 @@ import {
   Box 
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { Fund } from '../services/api';
+import { Fund } from '../types';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 
