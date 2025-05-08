@@ -6,13 +6,57 @@ declare module "*.svg" {
   }
   
   interface User {
-    _id: string;
+    id: string;
     name: string;
     email: string;
     active: boolean;
     amount: number
     role: "USER" | "ADMIN";
   }
+  export interface User {
+    id: string;
+    email: string;
+    name: string;
+    role: string;
+  }
+  
+  export interface Fund {
+    _id: string;
+    id: string;
+    name: string;
+    description: string;
+    plan: string;
+    targetAmount: number;
+    currentAmount: number;
+    createdAt: string;
+    createdBy: string;
+    isActive: boolean;
+  }
+  
+  export interface Donation {
+    createdAt: string | number | Date;
+    plan: any;
+    donatedBy: any;
+    _id: Key | null | undefined;
+    id: string;
+    fundId: string;
+    userId: string;
+    userName: string;
+    amount: number;
+    interval: string;
+    date: string;
+  }
+  
+  export interface FundAnalytics {
+    data: any;
+    donations: any;
+    currentAmount: any;
+    totalDonations: number;
+    donors: number;
+    recentDonations: Donation[];
+    monthlyGrowth: { month: string; amount: number }[];
+  }
+  
   
   interface ApiResponse<T> {
     donors: any;

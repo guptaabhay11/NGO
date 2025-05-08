@@ -1,51 +1,11 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { RootState } from "../store/store";
 import { Key } from "react";
-
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: string;
-}
-
-export interface Fund {
-  _id: string;
-  id: string;
-  name: string;
-  description: string;
-  plan: string;
-  targetAmount: number;
-  currentAmount: number;
-  createdAt: string;
-  createdBy: string;
-  isActive: boolean;
-}
-
-export interface Donation {
-  createdAt: string | number | Date;
-  plan: any;
-  donatedBy: any;
-  _id: Key | null | undefined;
-  id: string;
-  fundId: string;
-  userId: string;
-  userName: string;
-  amount: number;
-  interval: string;
-  date: string;
-}
-
-export interface FundAnalytics {
-  data: any;
-  donations: any;
-  currentAmount: any;
-  totalDonations: number;
-  donors: number;
-  recentDonations: Donation[];
-  monthlyGrowth: { month: string; amount: number }[];
-}
-
+import { User } from "../types";
+import { ApiResponse } from "../types";
+import { Fund } from "../types";
+import { FundAnalytics } from "../types";
+import { Donation } from "../types";
 const baseUrl = "http://localhost:5000/api/";
 
 export const api = createApi({
@@ -113,7 +73,7 @@ export const api = createApi({
     }),
 
   getAllFunds: builder.query<ApiResponse<Fund[]>, void>({
-  query: () => '/funds/all', // Adjust the endpoint if needed
+  query: () => '/funds/all', 
   providesTags: ['Funds'],
 }),
 
@@ -137,6 +97,14 @@ export const api = createApi({
       }),
     }),
 
+    addBankDetails: builder.mutation<void, {userId: string, bankDetails: string }>({
+      query: ({ userId, bankDetails }) => ({
+        url: `users/addBankDetails`,
+        method: "POST",
+        body: { bankDetails, userId },
+      }),
+    }),
+
     getRecentDonations: builder.query<Donation[], void>({
       query: () => "funds/recentDonations",
     }),
@@ -149,6 +117,7 @@ export const {
   useRegisterMutation,
   useLogoutMutation,
   useCreateFundMutation,
+  useAddBankDetailsMutation,
   useAddBalanceMutation,
   useDonateFundMutation,
   useGetAllFundsQuery,
