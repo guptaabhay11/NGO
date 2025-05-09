@@ -27,11 +27,7 @@ const FundSchema: Schema<IFund> = new Schema(
       default: 0,
       min: 0,
     },
-    plan: {
-      type: String,
-      enum: ["monthly", "quarterly", "half-yearly", "yearly"],
-      required: true,
-    },
+  
     donations: [
       {
         donatedBy: {

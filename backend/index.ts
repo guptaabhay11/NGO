@@ -10,9 +10,12 @@ import errorHandler from "./src/common/middleware/error-handler.middleware";
 import { initDB } from "./src/common/services/database.services";
 import { initPassport } from "./src/common/services/passport-jwt.services";
 import swaggerDocument from "./src/swagger/swagger.json";
-
 import routes from "./src/routes";
 import { type IUser } from "./src/user/user.dto";
+import {
+  stripeRouter,
+  stripeWebhookRouter,
+} from "./src/stripe/stripe.routes";
 
 
 
@@ -31,10 +34,18 @@ const app: Express = express();
 
 app.use(cors())
 app.use(helmet())
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use("/api/stripe", stripeWebhookRouter);
+
+
+
 app.use(bodyParser.json());
+
+
+
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(morgan("dev"));
+app.use("/api/stripe", stripeRouter);
 
 const initApp = async (): Promise<void> => {
   // init mongodb

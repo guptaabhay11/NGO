@@ -7,7 +7,6 @@ export interface IFund extends BaseSchema {
   description: string;
   targetAmount: number;
   currentAmount: number;
-  plan: string;
   donations: Array<{
     donatedBy: Types.ObjectId;  // who made the donation
     plan: {
