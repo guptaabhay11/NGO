@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { RootState } from "../store/store";
 import { Key } from "react";
-import { User } from "../types";
+import { Session, User } from "../types";
 import { ApiResponse } from "../types";
 import { Fund } from "../types";
 import { FundAnalytics } from "../types";
@@ -79,6 +79,13 @@ export const api = createApi({
 
     getFundAnalytics: builder.query<FundAnalytics, { fundId: string }>({
       query: ({ fundId }) => `funds/analytics/${fundId}`,
+    }),
+    createSession: builder.mutation<Session, { userId: string; priceId: string; fundId: string; interval: string }>({
+      query: ({ userId, priceId, fundId, interval }) => ({
+        url: `stripe/create-subscription-session`,
+        method: "POST",
+        body: { userId, priceId, fundId, interval },
+      }),
     }),
 
     deleteFund: builder.mutation<void, { fundId: string }>({

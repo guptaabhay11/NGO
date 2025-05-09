@@ -37,7 +37,7 @@ interface DonateModalProps {
 }
 
 const intervals = ['one-time', 'monthly', 'yearly'];
-const quickAmounts = [5, 10, 25, 50, 100];
+const quickAmounts = [1, 5, 10, 25, 50];
 
 const DonateModal: React.FC<DonateModalProps> = ({
   open,

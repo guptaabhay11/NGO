@@ -59,6 +59,10 @@ declare module "*.svg" {
     recentDonations: Donation[];
     monthlyGrowth: { month: string; amount: number }[];
   }
+  export interface Session {
+    data: any;
+    url: string
+  }
   
   
   interface ApiResponse<T> {
