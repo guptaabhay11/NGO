@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import UserSchema from "../user/user.schema";
 import { updateUser } from "../user/user.validation";
 import fundSchemas from "../fund/fund.schemas";
+import { create } from "domain";
 export const createCheckoutSession = async (userId: string, priceId: string, fundId: string, interval: string) => {
 
     const user = await UserSchema.findById(userId);
@@ -34,8 +35,8 @@ export const createCheckoutSession = async (userId: string, priceId: string, fun
           fundId, 
         },
       
-        success_url: `https://yourapp.com/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `https://yourapp.com/cancel`,
+        success_url: `http://localhost:3000/dashboard`,
+        cancel_url: `http://localhost:3000/cancel`,
       });
       return session;
   
@@ -45,6 +46,7 @@ export const createCheckoutSession = async (userId: string, priceId: string, fun
       customerId: string,
       amountPaid: number,
       invoiceId: string,
+      interval: string,
       fundId: string | null,
       date: Date
     ) => {
@@ -68,10 +70,16 @@ export const createCheckoutSession = async (userId: string, priceId: string, fun
       }
       fund.currentAmount = fund.currentAmount + amountPaid / 100;
       await fund.save();
+      console.log(fundId)
+      if (!fundId) {
+        console.warn("Fund ID is null, skipping donation history update.");
+        return null;
+      }
+
       const donation = {
-        fundId: fundId ? new mongoose.Types.ObjectId(fundId).toString() : '',
+        fundId: fundId,
         amount: amountPaid / 100,
-        interval: "monthly",
+        interval: interval,
         paymentDate: date,
         stripeInvoiceId: invoiceId,
       };
@@ -81,6 +89,21 @@ export const createCheckoutSession = async (userId: string, priceId: string, fun
     
       await user.save(); 
       console.log("Updated user after donation:", user);
+
+      const updateFundHistory = {
+        donatedBy: fundId,
+        plan: {
+          amount: amountPaid / 100,
+          interval: interval,
+        },
+        createdAt: date,
+      };
+
+      await fundSchemas.findByIdAndUpdate(fundId, {
+        $push: { recentDonations: updateFundHistory },
+    });
+      console.log("Updated fund after donation:", fund);
+
     
       return user;
     }

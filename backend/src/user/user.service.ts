@@ -1,5 +1,6 @@
 
 import { type IUser } from "./user.dto";
+import userSchema from "./user.schema";
 import UserSchema from "./user.schema";
 require('dotenv').config();
 import jwt from "jsonwebtoken";
@@ -68,5 +69,10 @@ export const addBankDetails = async (userId: string, bankDetails: string) => {
 
   return user;
 }
- 
+
+export const getDonationById = async(userId: string) => {
+  const donation = await userSchema.findById(userId).populate("donationHistory.fundId", "name email");
+  if (!donation) throw new Error("Fund not found");
+  return donation;
+}
 

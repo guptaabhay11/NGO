@@ -15,6 +15,7 @@ router
     .get("/all", catchError, fundController.getAllFunds)
     .get("/analytics/:id", roleAuth(['ADMIN', 'USER']), catchError, fundController.getFundAnalytics)
     .get("/getfund/:id", roleAuth(['ADMIN', 'USER']), catchError, fundController.getFundById)
+    .get("/donation/:id", roleAuth(['ADMIN', 'USER']), catchError, fundController.getDonationById)
     .get("/recentDonations", roleAuth(['ADMIN', 'USER']), catchError, fundController.getRecentDonations)
     .delete("/delete/:id", roleAuth(['ADMIN']), catchError, fundController.deleteFund);
 

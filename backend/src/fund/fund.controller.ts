@@ -55,4 +55,10 @@ export const getFundById = asyncHandler(async (req: Request, res: Response) => {
 }
 );
 
+export const getDonationById = asyncHandler (async (req: Request, res: Response) => {
+  const userId = req.params.id;
+  const fund = await fundService.getDonationById(userId);
+  res.send(createResponse("Donation of the user fetched")) 
+})
+
 

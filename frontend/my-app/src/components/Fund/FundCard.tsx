@@ -22,6 +22,7 @@ interface FundCardProps {
 const FundCard: React.FC<FundCardProps> = ({ fund, onDonate, onDelete }) => {
   const navigate = useNavigate();
   const { isAdmin } = useSelector((state: RootState) => state.auth);
+  console.log("isAdmin", isAdmin);
   
   const progress = Math.min((fund.currentAmount / fund.targetAmount) * 100, 100);
   const isFundClosed = progress >= 100;
