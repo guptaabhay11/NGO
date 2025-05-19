@@ -3,11 +3,11 @@ import { catchError } from "../common/middleware/catch-error.middleware";
 import * as stripeController from "./stripe.controller";
 import bodyParser from "body-parser";
 
-// Create two routers
+
 export const stripeRouter = Router();
 export const stripeWebhookRouter = Router();
 
-// Non-webhook routes
+
 stripeRouter.post("/create-subscription-session", catchError, stripeController.createSubscriptionSession);
 
 // Webhook route — with raw body parsing

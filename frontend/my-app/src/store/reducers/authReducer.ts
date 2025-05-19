@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { api } from '../../services/api';
-import { User } from '../../types'; 
+import { User } from '../../types';
 
 interface AuthState {
   user: User | null;
@@ -11,16 +11,13 @@ interface AuthState {
   isAuthenticated: boolean;
 }
 
-const ACCESS_TOKEN_KEY = 'access_token';
-const REFRESH_TOKEN_KEY = 'refresh_token';
-
 const initialState: AuthState = {
   user: null,
-  accessToken: localStorage.getItem(ACCESS_TOKEN_KEY),
-  refreshToken: localStorage.getItem(REFRESH_TOKEN_KEY),
+  accessToken: null,
+  refreshToken: null,
   loading: false,
   isAdmin: false,
-  isAuthenticated: !!localStorage.getItem(ACCESS_TOKEN_KEY),
+  isAuthenticated: false,
 };
 
 const authSlice = createSlice({
@@ -33,8 +30,6 @@ const authSlice = createSlice({
       state.refreshToken = null;
       state.isAdmin = false;
       state.isAuthenticated = false;
-      localStorage.removeItem(ACCESS_TOKEN_KEY);
-      localStorage.removeItem(REFRESH_TOKEN_KEY);
     },
     setUser: (state, action: PayloadAction<User>) => {
       state.user = action.payload;
@@ -49,16 +44,12 @@ const authSlice = createSlice({
       })
       .addMatcher(api.endpoints.login.matchFulfilled, (state, { payload }) => {
         const { accessToken, refreshToken, user } = payload.data;
-
         state.accessToken = accessToken;
         state.refreshToken = refreshToken;
         state.user = user;
         state.isAdmin = user.role === 'ADMIN';
         state.isAuthenticated = true;
         state.loading = false;
-
-        localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
-        localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
       })
       .addMatcher(api.endpoints.login.matchRejected, (state) => {
         state.accessToken = null;
@@ -77,8 +68,6 @@ const authSlice = createSlice({
         state.isAdmin = false;
         state.isAuthenticated = false;
         state.loading = false;
-        localStorage.removeItem(ACCESS_TOKEN_KEY);
-        localStorage.removeItem(REFRESH_TOKEN_KEY);
       });
   },
 });

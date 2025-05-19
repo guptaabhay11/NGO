@@ -5,28 +5,25 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  TextField,
-  MenuItem,
   CircularProgress,
   Alert,
   Typography,
   Box,
   Divider,
-  Slider,
   IconButton,
   Paper,
   Chip,
-  Stack,
-  InputAdornment
+  Stack
 } from '@mui/material';
 import {
   MonetizationOn as DonateIcon,
   Favorite as HeartIcon,
-  CalendarMonth as CalendarIcon,
   Close as CloseIcon
 } from '@mui/icons-material';
-import { useDonateFundMutation } from '../../services/api';
+import { useCreateSessionMutation, useMeQuery } from '../../services/api';
 import { Fund } from '../../types';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/store';
 
 interface DonateModalProps {
   open: boolean;
@@ -36,8 +33,12 @@ interface DonateModalProps {
   refetchFunds: () => void;
 }
 
-const intervals = ['one-time', 'monthly', 'yearly'];
-const quickAmounts = [1, 5, 10, 25, 50];
+const subscriptionPlans = [
+  { id: 'monthly', label: 'Monthly', price: 1, priceId: 'price_1RMUCdGa98Tin9whugMtfBLM' },
+  { id: 'quarterly', label: 'Quarterly', price: 5, priceId: 'price_1RMUCdGa98Tin9whsY4TbAAF' },
+  { id: 'half-yearly', label: 'Half Yearly', price: 10, priceId: 'price_1RMUCdGa98Tin9whcUWtMXCj' },
+  { id: 'yearly', label: 'Yearly', price: 20, priceId: 'price_1RMUCdGa98Tin9whRLrwVSwc' },
+];
 
 const DonateModal: React.FC<DonateModalProps> = ({
   open,
@@ -46,14 +47,17 @@ const DonateModal: React.FC<DonateModalProps> = ({
   refetchAnalytics,
   refetchFunds
 }) => {
-  const [amount, setAmount] = useState<number>(10);
-  const [interval, setInterval] = useState<string>('one-time');
-  const [donateFund, { isLoading }] = useDonateFundMutation();
+  const { user } = useSelector((state: RootState) => state.auth);
+  const { data: currentUser } = useMeQuery();
+  console.log("user from root", user);
+  console.log("curr", currentUser);
+
+  const [selectedPlan, setSelectedPlan] = useState<string>('monthly');
+  const [createSession, { isLoading }] = useCreateSessionMutation();
   
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   
-  // Calculate remaining amount needed
   const remainingAmount = Math.max(0, fund.targetAmount - fund.currentAmount);
   const progressPercentage = Math.min((fund.currentAmount / fund.targetAmount) * 100, 100);
   
@@ -69,24 +73,31 @@ const DonateModal: React.FC<DonateModalProps> = ({
   
   const handleDonate = async () => {
     try {
-      await donateFund({
+      if (!user?.id && !currentUser?.id) {
+        throw new Error('Please log in to make a donation');
+      }
+
+      const userId = user?.id || currentUser?.id;
+      const selectedPlanData = subscriptionPlans.find(plan => plan.id === selectedPlan);
+      if (!selectedPlanData) {
+        throw new Error('Selected plan not found');
+      }
+
+      const response = await createSession({
+        userId: userId as string,
+        priceId: selectedPlanData.priceId,
         fundId: fund._id,
-        amount,
-        interval
+        interval: selectedPlan
       }).unwrap();
       
-      refetchAnalytics();
-      refetchFunds();
-      setSuccessMessage('Donation successful! Thank you.');
-      setAmount(10);
-      setInterval('one-time');
-      
-      setTimeout(() => {
-        onClose();
-      }, 1500);
+      if (response.data?.url) {
+        window.location.href = response.data.url;
+      } else {
+        throw new Error('No checkout URL returned');
+      }
     } catch (err: any) {
-      console.error('Donation failed:', err);
-      setErrorMessage(err?.data?.message || 'Donation failed. Please try again.');
+      console.error('Checkout failed:', err);
+      setErrorMessage(err?.data?.message || err.message || 'Checkout failed. Please try again.');
     }
   };
   
@@ -161,73 +172,24 @@ const DonateModal: React.FC<DonateModalProps> = ({
           </Typography>
         </Paper>
 
-        {/* Quick amount selection */}
-        <Typography variant="subtitle1" gutterBottom sx={{ mt: 2, fontWeight: 'medium' }}>
-          Select Amount
-        </Typography>
-        
-        <Stack direction="row" spacing={1} sx={{ mb: 2, flexWrap: 'wrap', gap: 1 }}>
-          {quickAmounts.map((quickAmount) => (
-            <Chip
-              key={quickAmount}
-              label={`$${quickAmount}`}
-              onClick={() => setAmount(quickAmount)}
-              color={amount === quickAmount ? "primary" : "default"}
-              sx={{ 
-                px: 1,
-                '&:hover': { 
-                  bgcolor: amount === quickAmount ? 'primary.main' : 'action.hover' 
-                }
-              }}
-            />
-          ))}
-          <Chip
-            label="Custom"
-            color={!quickAmounts.includes(amount) ? "primary" : "default"}
-            sx={{ 
-              px: 1,
-              '&:hover': { 
-                bgcolor: !quickAmounts.includes(amount) ? 'primary.main' : 'action.hover' 
-              }
-            }}
-          />
-        </Stack>
-        
-        <TextField
-          label="Donation Amount"
-          type="number"
-          fullWidth
-          margin="normal"
-          value={amount}
-          onChange={(e) => setAmount(Number(e.target.value))}
-          inputProps={{ min: 1 }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">$</InputAdornment>
-            ),
-          }}
-          sx={{ mb: 3 }}
-        />
-        
         <Divider sx={{ my: 2 }} />
         
         <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'medium' }}>
-          Donation Frequency
+          Select Subscription Plan
         </Typography>
         
-        <Stack direction="row" spacing={1} sx={{ mb: 3 }}>
-          {intervals.map((option) => (
+        <Stack direction="row" spacing={1} sx={{ mb: 3, flexWrap: 'wrap', gap: 1 }}>
+          {subscriptionPlans.map((plan) => (
             <Chip
-              key={option}
-              label={option === 'one-time' ? 'One-time' : option.charAt(0).toUpperCase() + option.slice(1)}
-              icon={option === 'one-time' ? <DonateIcon /> : <CalendarIcon />}
-              onClick={() => setInterval(option)}
-              color={interval === option ? "primary" : "default"}
-              variant={interval === option ? "filled" : "outlined"}
+              key={plan.id}
+              label={`${plan.label} ($${plan.price})`}
+              onClick={() => setSelectedPlan(plan.id)}
+              color={selectedPlan === plan.id ? "primary" : "default"}
+              variant={selectedPlan === plan.id ? "filled" : "outlined"}
               sx={{ 
                 px: 1,
                 '&:hover': { 
-                  bgcolor: interval === option ? 'primary.main' : 'action.hover' 
+                  bgcolor: selectedPlan === plan.id ? 'primary.main' : 'action.hover' 
                 }
               }}
             />
@@ -266,7 +228,7 @@ const DonateModal: React.FC<DonateModalProps> = ({
         <Button
           onClick={handleDonate}
           variant="contained"
-          disabled={isLoading || amount <= 0}
+          disabled={isLoading}
           endIcon={isLoading ? undefined : <HeartIcon />}
           sx={{ 
             borderRadius: 2,
@@ -274,7 +236,7 @@ const DonateModal: React.FC<DonateModalProps> = ({
             py: 1
           }}
         >
-          {isLoading ? <CircularProgress size={24} /> : `Donate $${amount}`}
+          {isLoading ? <CircularProgress size={24} /> : `Subscribe ($${subscriptionPlans.find(p => p.id === selectedPlan)?.price})`}
         </Button>
       </DialogActions>
     </Dialog>

@@ -37,6 +37,8 @@ declare module "*.svg" {
   }
   
   export interface Donation {
+    stripeInvoiceId(arg0: string, stripeInvoiceId: any): void;
+    paymentDate: string | number | Date;
     createdAt: string | number | Date;
     plan: any;
     donatedBy: any;
@@ -62,6 +64,15 @@ declare module "*.svg" {
   export interface Session {
     data: any;
     url: string
+  }
+  export interface DonationResponse {
+    success: boolean;
+    data: {
+      donationHistory: Donation[];
+    };
+    name: string;
+    paymentDate: string;
+    invoiceId: string;
   }
   
   

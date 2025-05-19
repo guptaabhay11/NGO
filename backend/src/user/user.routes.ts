@@ -10,6 +10,7 @@ router
         .post("/register", userValidator.createUser, catchError, userController.createUser)
         .post("/login", userValidator.login, catchError, passport.authenticate('login', { session: false }), userController.login)
         .get("/me", roleAuth(['USER']), userController.getUserInfo)
+    .get("/donation/:id", roleAuth(['ADMIN', 'USER']), catchError, userController.getDonationById)
         .post("/addBankDetails", roleAuth(['USER']), catchError, userController.addBankDetails)
         .patch("/addBalance", roleAuth(['USER']), catchError, userController.addBalance)
         .post("/refresh", userValidator.refreshToken, catchError, userController.refreshToken); 

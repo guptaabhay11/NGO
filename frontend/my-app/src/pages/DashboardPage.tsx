@@ -6,14 +6,7 @@ import { RootState } from '../store/store';
 import DashboardComponent from '../components/Dashboard/DashboardPage';
 
 const DashboardPage: React.FC = () => {
-  const accessToken = localStorage.getItem('access_token');
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!accessToken) {
-      navigate('/auth');
-    }
-  }, [accessToken, navigate]);
 
   return (
     <Container maxWidth="sm" sx={{ mt: 4, mb: 8 }}>

@@ -15,6 +15,8 @@ export interface IUser extends BaseSchema {
       fundId: string;
       amount: number;
       interval: string;
+      paymentDate: Date;
+      stripeInvoiceId: string;
     }
   ];
   refreshToken?: string;

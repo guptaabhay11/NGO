@@ -55,7 +55,8 @@ const FundList: React.FC = () => {
   };
 
   // Format plan name to look nicer
-  const formatPlanName = (plan: string) => {
+  const formatPlanName = (plan?: string) => {
+    if (typeof plan !== 'string' || !plan.length) return "Unknown";
     return plan.charAt(0).toUpperCase() + plan.slice(1);
   };
 

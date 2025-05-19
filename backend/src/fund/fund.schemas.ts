@@ -63,11 +63,11 @@ const FundSchema: Schema<IFund> = new Schema(
     },
     startDate: {
       type: Date,
-      default: Date.now, // Default to current time
+      default: Date.now,
     },
   },
   {
-    timestamps: true, // Automatically add createdAt and updatedAt
+    timestamps: true,
   }
 );
 

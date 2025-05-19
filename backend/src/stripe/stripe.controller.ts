@@ -38,6 +38,7 @@ export const stripeWebhook = asyncHandler(async (req: Request, res: Response): P
       const customerId = invoice.customer;
       const amountPaid = invoice.amount_subtotal;
       const subscriptionId = invoice.subscription;
+      const interval = invoice.metadata?.interval;
       const invoiceId = invoice.id;
       const createdDate = new Date(invoice.created * 1000); // Convert Unix timestamp
       const fundId = invoice.metadata?.fundId || invoice.subscription_details?.metadata?.fundId;
@@ -55,6 +56,7 @@ export const stripeWebhook = asyncHandler(async (req: Request, res: Response): P
         customerId,
         amountPaid,
         invoiceId,
+        interval,
         fundId,
         createdDate
       );

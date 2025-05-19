@@ -47,10 +47,15 @@ export const donateFund = async (
     user.amount -= donation.amount;
     await user.save();
 
+
+    ///need to remove the part
+
     user.donationHistory.push({
-        fundId: fund._id,
+        fundId: fundId,
         amount: donation.amount,
         interval: donation.interval,
+        paymentDate: new Date(),
+        stripeInvoiceId: "dummy_invoice_id", // Replace with actual invoice ID if available
     });
     await user.save();
 
@@ -107,6 +112,12 @@ export const getRecentDonations = async () => {
 
 export const getFundById = async (fundId: string) => {
     const fund = await fundSchemas.findById(fundId).populate("admin", "name email");
+    if (!fund) throw new Error("Fund not found");
+    return fund;
+}
+
+export const getDonationById = async (userId: string) => {
+    const fund = await fundSchemas.findById(userId).populate("donations.donatedBy", "name email");
     if (!fund) throw new Error("Fund not found");
     return fund;
 }

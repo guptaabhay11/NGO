@@ -94,3 +94,9 @@ export const addBankDetails = asyncHandler(async (req: Request, res: Response) =
 }
 );
 
+export const getDonationById = asyncHandler(async (req: Request, res: Response) => {
+  const userId = req.params.id;
+  const donations = await userService.getDonationById(userId);
+  res.send(createResponse(donations));
+})
+
